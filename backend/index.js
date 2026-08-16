@@ -18,11 +18,12 @@ const corsOptions = {
 }
 app.use(cors(corsOptions));
 
+import userRoute from "./routes/user.route.js";
+
 const PORT = process.env.PORT || 8000;
 
-app.get('/', (req, res) => {
-    res.send("Backend server is running!");
-});
+// api's
+app.use("/api/v1/user", userRoute);
 
 app.listen(PORT, () => {
     connectDB();

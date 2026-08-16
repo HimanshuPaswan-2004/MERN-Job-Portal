@@ -4,9 +4,9 @@
 - `[x]` Initialize Project and Folder Structure
 - `[x]` Init Node/Express project (`npm init -y`)
 - `[x]` Setup MongoDB connection with Mongoose
-- `[ ]` Create User model
-- `[ ]` Implement API endpoints (`/register`, `/login`, `/logout`, `/profile/update`)
-- `[ ]` Setup JWT authentication and middleware
+- `[x]` Create User model
+- `[x]` Implement API endpoints (`/register`, `/login`, `/logout`, `/profile/update`)
+- `[x]` Setup JWT authentication and middleware
 
 ## Day 2: Core Backend Logic
 - `[ ]` Create Company and Job models
