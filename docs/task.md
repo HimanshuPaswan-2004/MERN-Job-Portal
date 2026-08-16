@@ -9,23 +9,23 @@
 - `[x]` Setup JWT authentication and middleware
 
 ## Day 2: Core Backend Logic
-- `[ ]` Create Company and Job models
-- `[ ]` Implement Company APIs
-- `[ ]` Implement Job APIs
-- `[ ]` Add Cloudinary integration for file uploads
+- `[x]` Create Company and Job models
+- `[x]` Implement Company APIs
+- `[x]` Implement Job APIs
+- `[x]` Add Cloudinary integration for file uploads
 
 ## Day 3: Frontend Setup & UI Foundation
-- `[ ]` Init Vite React app
-- `[ ]` Install Tailwind CSS and Shadcn UI
-- `[ ]` Setup React Router DOM
-- `[ ]` Implement Light/Dark mode
-- `[ ]` Build Navbar, Footer, and animated Hero Section
+- `[x]` Init Vite React app
+- `[x]` Install Tailwind CSS and Shadcn UI
+- `[x]` Setup React Router DOM
+- `[x]` Implement Light/Dark mode
+- `[x]` Build Navbar, Footer, and animated Hero Section
 
 ## Day 4: Authentication UI & Redux Integration
-- `[ ]` Build Login and Signup pages
-- `[ ]` Setup Redux Toolkit and `redux-persist`
-- `[ ]` Connect Auth APIs to UI
-- `[ ]` Build User Profile page
+- `[x]` Build Login and Signup pages
+- `[x]` Setup Redux Toolkit and `redux-persist`
+- `[x]` Connect Auth APIs to UI
+- `[x]` Build User Profile page
 
 ## Day 5: Candidate Experience
 - `[ ]` Build "Jobs" and "Browse" pages with filtering
