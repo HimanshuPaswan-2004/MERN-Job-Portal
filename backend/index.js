@@ -3,10 +3,9 @@ import dotenv from "dotenv";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import connectDB from "./utils/db.js";
+import { app, server } from "./utils/socket.js";
 
 dotenv.config();
-
-const app = express();
 
 // middleware
 app.use(express.json());
@@ -31,7 +30,7 @@ app.use("/api/v1/company", companyRoute);
 app.use("/api/v1/job", jobRoute);
 app.use("/api/v1/application", applicationRoute);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     connectDB();
     console.log(`Server running at port ${PORT}`);
 });

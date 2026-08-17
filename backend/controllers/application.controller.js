@@ -1,5 +1,6 @@
 import { Application } from "../models/application.model.js";
 import { Job } from "../models/job.model.js";
+import { getReceiverSocketId, io } from "../utils/socket.js";
 
 export const applyJob = async (req, res) => {
     try {
@@ -121,6 +122,16 @@ export const updateStatus = async (req,res) => {
         // update the status
         application.status = status.toLowerCase();
         await application.save();
+
+        // socket io for real time notifications
+        const applicantId = application.applicant;
+        const receiverSocketId = getReceiverSocketId(applicantId);
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit('notification', {
+                message: `Your application status for ${status}`,
+                success: true
+            });
+        }
 
         return res.status(200).json({
             message:"Status updated successfully.",

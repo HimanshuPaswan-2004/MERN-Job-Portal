@@ -34,12 +34,12 @@
 - `[x]` Update User Profile for "Applied Jobs"
 
 ## Day 6: Recruiter Experience
-- `[ ]` Build "Companies" dashboard
-- `[ ]` Build "Post Job" form
-- `[ ]` Build "Applicants Tracker"
-- `[ ]` Connect Accept/Reject APIs
+- `[x]` Build "Companies" dashboard
+- `[x]` Build "Post Job" form
+- `[x]` Build "Applicants Tracker"
+- `[x]` Connect Accept/Reject APIs
 
 ## Day 7: Real-Time Features & Polish
-- `[ ]` Integrate `socket.io` for notifications
-- `[ ]` Add infinite scrolling/pagination
-- `[ ]` End-to-end testing
+- `[x]` Integrate `socket.io` for notifications
+- `[x]` Add infinite scrolling/pagination
+- `[x]` End-to-end testing
