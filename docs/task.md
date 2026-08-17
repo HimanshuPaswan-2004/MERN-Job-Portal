@@ -28,10 +28,10 @@
 - `[x]` Build User Profile page
 
 ## Day 5: Candidate Experience
-- `[ ]` Build "Jobs" and "Browse" pages with filtering
-- `[ ]` Create Job Cards and Job Description pages
-- `[ ]` Implement "Apply for Job"
-- `[ ]` Update User Profile for "Applied Jobs"
+- `[x]` Build "Jobs" and "Browse" pages with filtering
+- `[x]` Create Job Cards and Job Description pages
+- `[x]` Implement "Apply for Job"
+- `[x]` Update User Profile for "Applied Jobs"
 
 ## Day 6: Recruiter Experience
 - `[ ]` Build "Companies" dashboard
