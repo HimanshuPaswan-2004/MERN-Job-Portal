@@ -66,7 +66,7 @@ npm run dev
 ```
 
 ### 4. Open the App
-Visit `http://localhost:5173` in your browser.
+Visit `http://localhost:5173` in your browser..
 
 ---
 *Built with ❤️ and the MERN Stack.*
