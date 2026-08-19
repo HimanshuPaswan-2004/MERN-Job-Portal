@@ -31,21 +31,21 @@ const FilterCard = () => {
     }, [selectedValue, dispatch]);
 
     return (
-        <div className='w-full bg-white p-3 rounded-md'>
-            <h1 className='font-bold text-lg'>Filter Jobs</h1>
-            <hr className='mt-3' />
+        <div className='w-full bg-white p-5 rounded-2xl shadow-sm border border-gray-100 sticky top-24'>
+            <h1 className='font-bold text-xl text-gray-900'>Filter Jobs</h1>
+            <hr className='mt-4 mb-6 border-gray-100' />
             <RadioGroup value={selectedValue} onValueChange={changeHandler}>
                 {
                     filterData.map((data, index) => (
-                        <div key={index}>
-                            <h1 className='font-bold text-lg mt-2'>{data.filterType}</h1>
+                        <div key={index} className="mb-6 last:mb-0">
+                            <h1 className='font-semibold text-gray-800 mb-3'>{data.filterType}</h1>
                             {
                                 data.array.map((item, idx) => {
                                     const itemId = `id${index}-${idx}`
                                     return (
-                                        <div key={itemId} className='flex items-center space-x-2 my-2'>
-                                            <RadioGroupItem value={item} id={itemId} />
-                                            <Label htmlFor={itemId}>{item}</Label>
+                                        <div key={itemId} className='flex items-center space-x-3 my-3'>
+                                            <RadioGroupItem value={item} id={itemId} className="text-[#6A38C2] border-gray-300" />
+                                            <Label htmlFor={itemId} className="text-gray-600 font-medium cursor-pointer">{item}</Label>
                                         </div>
                                     )
                                 })
