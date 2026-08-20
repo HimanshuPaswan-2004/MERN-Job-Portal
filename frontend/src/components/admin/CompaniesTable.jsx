@@ -22,9 +22,9 @@ const CompaniesTable = () => {
     },[companies, searchCompanyByText])
     
     return (
-        <div>
-            <Table>
-                <TableCaption>A list of your recent registered companies</TableCaption>
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mt-6">
+            <Table className="w-full">
+                <TableCaption className="pb-4 text-gray-500">A list of your recent registered companies</TableCaption>
                 <TableHeader>
                     <TableRow>
                         <TableHead>Logo</TableHead>
@@ -36,9 +36,9 @@ const CompaniesTable = () => {
                 <TableBody>
                     {
                         filterCompany?.map((company) => (
-                            <TableRow key={company._id}>
+                            <TableRow key={company._id} className="hover:bg-purple-50/50 transition-colors duration-200 group">
                                 <TableCell>
-                                    <Avatar>
+                                    <Avatar className="ring-2 ring-transparent group-hover:ring-purple-200 transition-all duration-300 shadow-sm">
                                         <AvatarImage src={company.logo || "https://github.com/shadcn.png"} />
                                     </Avatar>
                                 </TableCell>
@@ -46,9 +46,9 @@ const CompaniesTable = () => {
                                 <TableCell>{company.createdAt.split("T")[0]}</TableCell>
                                 <TableCell className="text-right cursor-pointer">
                                     <Popover>
-                                        <PopoverTrigger><MoreHorizontal /></PopoverTrigger>
-                                        <PopoverContent className="w-32">
-                                            <div onClick={()=> navigate(`/admin/companies/${company._id}`)} className='flex items-center gap-2 w-fit cursor-pointer'>
+                                        <PopoverTrigger><MoreHorizontal className="text-gray-500 group-hover:text-purple-600 transition-colors" /></PopoverTrigger>
+                                        <PopoverContent className="w-32 rounded-xl shadow-lg border-gray-100">
+                                            <div onClick={()=> navigate(`/admin/companies/${company._id}`)} className='flex items-center gap-2 w-fit cursor-pointer text-gray-700 hover:text-purple-600 transition-colors'>
                                                 <Edit2 className='w-4' />
                                                 <span>Edit</span>
                                             </div>

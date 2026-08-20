@@ -16,15 +16,15 @@ const Job = ({ job }) => {
     }
 
     return (
-        <div className='p-5 rounded-2xl shadow-sm bg-white border border-gray-100 hover:-translate-y-1.5 hover:shadow-2xl transition-all duration-300 group'>
+        <div className='p-5 rounded-2xl bg-white/80 backdrop-blur-md border border-purple-50 hover:border-purple-200 shadow-md hover:shadow-2xl hover:shadow-purple-200/50 hover:-translate-y-1 hover:scale-[1.01] transition-all duration-300 group'>
             <div className='flex items-center justify-between'>
                 <p className='text-sm text-gray-500'>{job?.createdAt ? (daysAgoFunction(job.createdAt) === 0 ? "Today" : `${daysAgoFunction(job.createdAt)} days ago`) : "Unknown"}</p>
                 <Button variant="outline" className="rounded-full" size="icon"><Bookmark /></Button>
             </div>
 
             <div className='flex items-center gap-4 my-4'>
-                <Button className="p-6 w-14 h-14 bg-gray-50 border-gray-100 group-hover:border-purple-200 transition-colors" variant="outline" size="icon">
-                    <Avatar>
+                <Button className="p-6 w-14 h-14 bg-white/50 border-gray-200 group-hover:border-purple-300 group-hover:shadow-md transition-all duration-300" variant="outline" size="icon">
+                    <Avatar className="w-10 h-10">
                         <AvatarImage src={job?.company?.logo || "https://www.shutterstock.com/image-vector/circle-line-simple-design-logo-600nw-2174926871.jpg"} alt={job?.company?.name || "Company Logo"} />
                     </Avatar>
                 </Button>
@@ -40,14 +40,14 @@ const Job = ({ job }) => {
             </div>
             
             <div className='flex flex-wrap items-center gap-2 mt-5'>
-                <Badge className={'text-blue-700 bg-blue-50 border-transparent hover:bg-blue-100 font-semibold px-3 py-1'} variant="ghost">{job?.position || 0} Positions</Badge>
-                <Badge className={'text-[#F83002] bg-red-50 border-transparent hover:bg-red-100 font-semibold px-3 py-1'} variant="ghost">{job?.jobType || "Full Time"}</Badge>
-                <Badge className={'text-[#6A38C2] bg-purple-50 border-transparent hover:bg-purple-100 font-semibold px-3 py-1'} variant="ghost">{job?.salary || 0}LPA</Badge>
+                <Badge className={'text-blue-700 bg-blue-50 border border-blue-200/50 hover:bg-blue-100 font-semibold px-4 py-1 rounded-full shadow-sm'} variant="ghost">{job?.position || 0} Positions</Badge>
+                <Badge className={'text-[#F83002] bg-red-50 border border-red-200/50 hover:bg-red-100 font-semibold px-4 py-1 rounded-full shadow-sm'} variant="ghost">{job?.jobType || "Full Time"}</Badge>
+                <Badge className={'text-[#6A38C2] bg-purple-50 border border-purple-200/50 hover:bg-purple-100 font-semibold px-4 py-1 rounded-full shadow-sm'} variant="ghost">{job?.salary || 0}LPA</Badge>
             </div>
 
             <div className='flex items-center gap-4 mt-6'>
-                <Button onClick={() => navigate(`/description/${job?._id}`)} variant="outline" className="flex-1 rounded-xl font-medium border-gray-300 hover:bg-gray-50">Details</Button>
-                <Button className="flex-1 bg-[#6A38C2] hover:bg-[#5b30a6] text-white rounded-xl font-medium shadow-md">Save For Later</Button>
+                <Button onClick={() => navigate(`/description/${job?._id}`)} variant="outline" className="flex-1 rounded-xl font-medium border-gray-300 hover:bg-gray-100 hover:border-gray-400 transition-all shadow-sm">Details</Button>
+                <Button className="flex-1 bg-gradient-to-r from-[#6A38C2] to-[#8c52ff] hover:from-[#5b30a6] hover:to-[#6A38C2] text-white rounded-xl font-medium shadow-md hover:shadow-xl hover:-translate-y-0.5 transition-all duration-300">Save For Later</Button>
             </div>
         </div>
     )
