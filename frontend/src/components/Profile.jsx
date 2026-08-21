@@ -3,6 +3,8 @@ import Navbar from './shared/Navbar'
 import { useSelector } from 'react-redux'
 import AppliedJobTable from './AppliedJobTable'
 import useGetAppliedJobs from '@/hooks/useGetAppliedJobs'
+import { useState } from 'react'
+import UpdateProfileDialog from './UpdateProfileDialog'
 
 import { Contact, Mail, Pen } from 'lucide-react'
 import { Avatar, AvatarImage } from './ui/avatar'
@@ -12,6 +14,7 @@ import { Label } from './ui/label'
 
 const Profile = () => {
     useGetAppliedJobs();
+    const [open, setOpen] = useState(false);
     const { user } = useSelector(store => store.auth);
     
     // Check if skills exist, otherwise provide empty array
@@ -31,7 +34,7 @@ const Profile = () => {
                             <p className='text-gray-500 font-medium mt-1'>{user?.profile?.bio || "No bio provided"}</p>
                         </div>
                     </div>
-                    <Button className="text-right" variant="outline" size="icon"><Pen className="h-4 w-4" /></Button>
+                    <Button onClick={() => setOpen(true)} className="text-right" variant="outline" size="icon"><Pen className="h-4 w-4" /></Button>
                 </div>
                 
                 <div className='my-8 space-y-4'>
@@ -72,6 +75,7 @@ const Profile = () => {
                 {/* Applied Job Table   */}
                 <AppliedJobTable />
             </div>
+            <UpdateProfileDialog open={open} setOpen={setOpen}/>
         </div>
     )
 }
