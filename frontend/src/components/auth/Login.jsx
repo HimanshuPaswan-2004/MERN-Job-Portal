@@ -9,6 +9,7 @@ import { USER_API_END_POINT } from '@/utils/constant'
 import { toast } from 'sonner'
 import { useDispatch, useSelector } from 'react-redux'
 import { setLoading, setUser } from '@/redux/authSlice'
+import { Loader2 } from 'lucide-react'
 
 const Login = () => {
     const [input, setInput] = useState({
@@ -70,7 +71,7 @@ const Login = () => {
                             </div>
                         </div>
                     </div>
-                    {loading ? <Button className="w-full my-4" disabled>Please wait...</Button> : <Button type="submit" className="w-full my-4 bg-primary hover:bg-primary/90 text-primary-foreground">Login</Button>}
+                    {loading ? <Button className="w-full my-4" disabled><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please wait...</Button> : <Button type="submit" className="w-full my-4 bg-primary hover:bg-primary/90 text-primary-foreground">Login</Button>}
                     <span className='text-sm text-muted-foreground'>Don't have an account? <Link to="/signup" className='text-primary hover:underline'>Signup</Link></span>
                 </form>
             </div>
@@ -79,3 +80,4 @@ const Login = () => {
 }
 
 export default Login
+
