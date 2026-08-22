@@ -15,7 +15,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <ThemeProvider defaultTheme="light" storageKey="jobportal-theme">
+        <ThemeProvider attribute="class" defaultTheme="light" storageKey="jobportal-theme">
           <App />
           <Toaster />
         </ThemeProvider>
@@ -23,3 +23,4 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     </Provider>
   </React.StrictMode>,
 )
+
