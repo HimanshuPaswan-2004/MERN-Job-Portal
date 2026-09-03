@@ -6,6 +6,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import RecruiterDashboard from './pages/RecruiterDashboard';
 import MyCompanies from './pages/MyCompanies';
 import CompanyForm from './pages/CompanyForm';
+import MyJobs from './pages/MyJobs';
+import JobForm from './pages/JobForm';
 
 // Dummy components for now
 const CandidateDashboard = () => <div className="text-center mt-10 text-xl">Candidate Dashboard</div>;
@@ -57,6 +59,9 @@ function App() {
               <Route path="/recruiter/companies" element={<MyCompanies />} />
               <Route path="/recruiter/companies/new" element={<CompanyForm />} />
               <Route path="/recruiter/companies/:id/edit" element={<CompanyForm />} />
+              <Route path="/recruiter/jobs" element={<MyJobs />} />
+              <Route path="/recruiter/jobs/new" element={<JobForm />} />
+              <Route path="/recruiter/jobs/:id/edit" element={<JobForm />} />
             </Route>
           </Routes>
         </main>
