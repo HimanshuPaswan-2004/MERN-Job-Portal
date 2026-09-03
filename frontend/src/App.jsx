@@ -3,10 +3,12 @@ import { useAuth } from './context/AuthContext';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
+import RecruiterDashboard from './pages/RecruiterDashboard';
+import MyCompanies from './pages/MyCompanies';
+import CompanyForm from './pages/CompanyForm';
 
 // Dummy components for now
 const CandidateDashboard = () => <div className="text-center mt-10 text-xl">Candidate Dashboard</div>;
-const RecruiterDashboard = () => <div className="text-center mt-10 text-xl">Recruiter Dashboard</div>;
 const Home = () => <div className="text-center text-2xl mt-10">Welcome to JobPortal</div>;
 
 const Navigation = () => {
@@ -52,6 +54,9 @@ function App() {
             {/* Recruiter Protected Routes */}
             <Route element={<ProtectedRoute allowedRoles={['recruiter']} />}>
               <Route path="/recruiter/dashboard" element={<RecruiterDashboard />} />
+              <Route path="/recruiter/companies" element={<MyCompanies />} />
+              <Route path="/recruiter/companies/new" element={<CompanyForm />} />
+              <Route path="/recruiter/companies/:id/edit" element={<CompanyForm />} />
             </Route>
           </Routes>
         </main>

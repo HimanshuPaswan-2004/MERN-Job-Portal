@@ -6,6 +6,7 @@ import connectDB from './src/config/db.js';
 import { errorHandler, notFound } from './src/middleware/errorMiddleware.js';
 
 import authRoutes from './src/routes/authRoutes.js';
+import companyRoutes from './src/routes/companyRoutes.js';
 
 dotenv.config();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/companies', companyRoutes);
 
 app.get('/', (req, res) => {
   res.send('JobPortal API is running...');
