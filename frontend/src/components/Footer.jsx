@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Briefcase, Linkedin, Twitter, Instagram, Youtube, Heart } from 'lucide-react';
+import { Briefcase, Globe, Mail, MessageCircle, Heart } from 'lucide-react';
 
 const Footer = () => {
   const footerLinks = [
@@ -46,16 +46,13 @@ const Footer = () => {
           {/* Social Icons */}
           <div className="flex items-center space-x-4">
             <a href="#" className="text-gray-400 hover:text-brand-600 transition-colors">
-              <Linkedin className="h-5 w-5" />
+              <Globe className="h-5 w-5" />
             </a>
             <a href="#" className="text-gray-400 hover:text-brand-600 transition-colors">
-              <Twitter className="h-5 w-5" />
+              <Mail className="h-5 w-5" />
             </a>
             <a href="#" className="text-gray-400 hover:text-brand-600 transition-colors">
-              <Instagram className="h-5 w-5" />
-            </a>
-            <a href="#" className="text-gray-400 hover:text-brand-600 transition-colors">
-              <Youtube className="h-5 w-5" />
+              <MessageCircle className="h-5 w-5" />
             </a>
           </div>
         </div>
