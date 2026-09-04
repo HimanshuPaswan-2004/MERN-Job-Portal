@@ -227,3 +227,26 @@ export const deleteJob = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get aggregate stats (total jobs, companies)
+// @route   GET /api/jobs/stats
+// @access  Public
+export const getStats = async (req, res, next) => {
+  try {
+    const totalJobs = await Job.countDocuments({ status: 'active' });
+    const totalCompanies = await Company.countDocuments();
+    // In a real app we might count successful hires or users
+    const successfulHires = 1250000; // Mocked for marketing
+
+    res.status(200).json({
+      success: true,
+      data: {
+        totalJobs,
+        totalCompanies,
+        successfulHires
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
