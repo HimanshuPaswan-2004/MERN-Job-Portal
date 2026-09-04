@@ -158,27 +158,19 @@ const Jobs = () => {
   return (
     <div className="bg-[#fcf9f2] min-h-screen pb-20">
       {/* Hero Header */}
-      <div className="bg-brand-50 pt-16 pb-12 border-b border-brand-100/50">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center relative">
-            <div className="max-w-2xl z-10">
-              <h1 className="text-4xl md:text-5xl font-black text-gray-900 tracking-tight leading-tight mb-4">
-                Explore <span className="text-brand-600">Jobs</span>
-              </h1>
-              <p className="text-xl text-gray-600 font-medium">Find the right job, right now.</p>
-            </div>
-            
-            {/* Decorative background elements */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 hidden md:block opacity-70 pointer-events-none">
-                <div className="relative">
-                  <div className="absolute -top-20 -right-10 w-64 h-64 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
-                  <div className="text-right">
-                    <p className="text-xl font-bold text-gray-600 italic -rotate-6 transform inline-block mr-10">
-                      "Opportunities <br/>don't happen,<br/>you create them."
-                    </p>
-                  </div>
-                </div>
-            </div>
+      <div className="bg-gradient-to-r from-brand-50 via-orange-50 to-white pt-16 pb-16 border-b border-brand-100/50 relative overflow-hidden">
+        {/* Subtle decorative background blobs */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-brand-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-30 translate-x-1/3 -translate-y-1/3"></div>
+        <div className="absolute bottom-0 left-10 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-[80px] opacity-30 -translate-x-1/3 translate-y-1/3"></div>
+        
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="max-w-3xl">
+            <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-black text-gray-900 tracking-tight leading-tight mb-4">
+              Explore <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-orange-500">Jobs</span>
+            </h1>
+            <p className="text-lg md:text-xl text-gray-600 font-medium max-w-xl leading-relaxed">
+              Find the right job, right now. Browse thousands of opportunities and accelerate your career.
+            </p>
           </div>
         </div>
       </div>
