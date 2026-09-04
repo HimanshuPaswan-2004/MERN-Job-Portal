@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import Signup from './pages/Signup';
 import Login from './pages/Login';
@@ -21,40 +21,49 @@ const MainLayout = ({ children }) => (
   </div>
 );
 
+const AppContent = () => {
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col">
+      {!isAuthPage && <Navbar />}
+      
+      <main className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          
+          {/* Auth routes without MainLayout (they are full screen themselves) */}
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/login" element={<Login />} />
+          
+          {/* Candidate Protected Routes */}
+          <Route element={<ProtectedRoute allowedRoles={['candidate']} />}>
+            <Route path="/candidate/dashboard" element={<MainLayout><CandidateDashboard /></MainLayout>} />
+          </Route>
+          
+          {/* Recruiter Protected Routes */}
+          <Route element={<ProtectedRoute allowedRoles={['recruiter']} />}>
+            <Route path="/recruiter/dashboard" element={<MainLayout><RecruiterDashboard /></MainLayout>} />
+            <Route path="/recruiter/companies" element={<MainLayout><MyCompanies /></MainLayout>} />
+            <Route path="/recruiter/companies/new" element={<MainLayout><CompanyForm /></MainLayout>} />
+            <Route path="/recruiter/companies/:id/edit" element={<MainLayout><CompanyForm /></MainLayout>} />
+            <Route path="/recruiter/jobs" element={<MainLayout><MyJobs /></MainLayout>} />
+            <Route path="/recruiter/jobs/new" element={<MainLayout><JobForm /></MainLayout>} />
+            <Route path="/recruiter/jobs/:id/edit" element={<MainLayout><JobForm /></MainLayout>} />
+          </Route>
+        </Routes>
+      </main>
+      
+      {!isAuthPage && <Footer />}
+    </div>
+  );
+};
+
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-white flex flex-col">
-        <Navbar />
-        
-        <main className="flex-grow">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            
-            {/* Wrap other routes in MainLayout for padding/container */}
-            <Route path="/signup" element={<MainLayout><Signup /></MainLayout>} />
-            <Route path="/login" element={<MainLayout><Login /></MainLayout>} />
-            
-            {/* Candidate Protected Routes */}
-            <Route element={<ProtectedRoute allowedRoles={['candidate']} />}>
-              <Route path="/candidate/dashboard" element={<MainLayout><CandidateDashboard /></MainLayout>} />
-            </Route>
-            
-            {/* Recruiter Protected Routes */}
-            <Route element={<ProtectedRoute allowedRoles={['recruiter']} />}>
-              <Route path="/recruiter/dashboard" element={<MainLayout><RecruiterDashboard /></MainLayout>} />
-              <Route path="/recruiter/companies" element={<MainLayout><MyCompanies /></MainLayout>} />
-              <Route path="/recruiter/companies/new" element={<MainLayout><CompanyForm /></MainLayout>} />
-              <Route path="/recruiter/companies/:id/edit" element={<MainLayout><CompanyForm /></MainLayout>} />
-              <Route path="/recruiter/jobs" element={<MainLayout><MyJobs /></MainLayout>} />
-              <Route path="/recruiter/jobs/new" element={<MainLayout><JobForm /></MainLayout>} />
-              <Route path="/recruiter/jobs/:id/edit" element={<MainLayout><JobForm /></MainLayout>} />
-            </Route>
-          </Routes>
-        </main>
-        
-        <Footer />
-      </div>
+      <AppContent />
     </Router>
   );
 }
