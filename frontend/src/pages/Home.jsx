@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Search, MapPin, Briefcase, FileText, Bell, TrendingUp, Code, Database, Palette, LayoutDashboard, Megaphone, Users, ArrowRight, CheckCircle2 } from 'lucide-react';
 
-// --- Hero Section ---
+// --- HeroSection ---
 const HeroSection = () => {
   const navigate = useNavigate();
   const [keyword, setKeyword] = useState('');
@@ -25,7 +25,7 @@ const HeroSection = () => {
         if (data.success) {
           setStats({
             jobs: data.data.totalJobs > 0 ? data.data.totalJobs : '50K+',
-            companies: data.data.totalCompanies > 0 ? data.data.totalCompanies : '10K+',
+            companies: data.data.totalCompanies > 0 ? data.data.totalCompanies : '4',
             hires: '1M+' // keep static for now
           });
         }
@@ -34,116 +34,147 @@ const HeroSection = () => {
   }, []);
 
   return (
-    <section className="relative bg-brand-50 pt-16 pb-24 overflow-hidden">
+    <section className="relative bg-[#fcf9f2] pt-12 pb-20 lg:pt-20 lg:pb-28 overflow-hidden">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
+        <div className="flex flex-col lg:flex-row gap-12 items-center">
           
           {/* Left Content */}
-          <div className="max-w-2xl">
-            <span className="inline-block py-1 px-3 rounded-full bg-brand-100 text-brand-600 text-sm font-semibold mb-6">
-              #1 Job Platform for Your Career
-            </span>
-            <h1 className="text-5xl lg:text-7xl font-extrabold text-gray-900 leading-tight mb-6">
+          <div className="w-full lg:w-[55%] xl:w-1/2 flex flex-col justify-center relative z-20">
+            <div className="mb-6">
+              <span className="inline-block py-1.5 px-4 rounded-full bg-orange-100/70 text-orange-600 text-sm font-semibold">
+                #1 Job Platform for Your Career
+              </span>
+            </div>
+            
+            <h1 className="text-5xl lg:text-[4.5rem] font-extrabold text-[#111827] leading-[1.1] mb-6 tracking-tight">
               Find Your <br />
               <span className="text-brand-600">Dream Job</span>
             </h1>
-            <p className="text-lg text-gray-600 mb-8 max-w-xl">
+            
+            <p className="text-lg text-gray-600 mb-10 max-w-lg leading-relaxed">
               Discover thousands of job opportunities, connect with top companies, and take the next step in your career.
             </p>
             
             {/* Search Form */}
-            <form onSubmit={handleSearch} className="bg-white p-2 rounded-full shadow-lg flex flex-col md:flex-row items-center gap-2 mb-8">
+            <form onSubmit={handleSearch} className="bg-white p-2.5 rounded-full shadow-lg shadow-gray-200/50 flex flex-col md:flex-row items-center mb-6 w-full max-w-2xl border border-gray-100">
               <div className="flex-1 flex items-center pl-4 w-full border-b md:border-b-0 md:border-r border-gray-200 py-2 md:py-0">
-                <Search className="h-5 w-5 text-gray-400" />
+                <Search className="h-5 w-5 text-gray-400 shrink-0" />
                 <input
                   type="text"
                   placeholder="Job title, skills or keywords"
-                  className="w-full px-3 py-2 text-gray-700 outline-none"
+                  className="w-full px-3 py-2 text-gray-700 outline-none text-sm bg-transparent placeholder-gray-400"
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
                 />
               </div>
               <div className="flex-1 flex items-center pl-4 w-full py-2 md:py-0">
-                <MapPin className="h-5 w-5 text-gray-400" />
+                <MapPin className="h-5 w-5 text-gray-400 shrink-0" />
                 <input
                   type="text"
                   placeholder="Location"
-                  className="w-full px-3 py-2 text-gray-700 outline-none"
+                  className="w-full px-3 py-2 text-gray-700 outline-none text-sm bg-transparent placeholder-gray-400"
                   value={location}
                   onChange={(e) => setLocation(e.target.value)}
                 />
               </div>
               <button
                 type="submit"
-                className="w-full md:w-auto bg-brand-600 hover:bg-brand-700 text-white px-8 py-3 rounded-full font-medium transition-colors flex items-center justify-center gap-2"
+                className="w-full md:w-auto bg-brand-600 hover:bg-brand-700 text-white px-8 py-3.5 rounded-full font-medium transition-colors flex items-center justify-center gap-2 shadow-md hover:shadow-lg whitespace-nowrap"
               >
                 Search Jobs <ArrowRight className="h-4 w-4" />
               </button>
             </form>
             
             {/* Popular Searches */}
-            <div className="flex flex-wrap items-center gap-2 mb-12">
-              <span className="text-sm text-gray-500">Popular searches:</span>
+            <div className="flex flex-wrap items-center gap-2 mb-16 lg:mb-24">
+              <span className="text-sm text-gray-500 mr-1">Popular searches:</span>
               {['Frontend', 'Backend', 'Data Scientist', 'Remote', 'Internship'].map((tag) => (
-                <span key={tag} className="text-xs bg-gray-100 text-gray-600 px-3 py-1 rounded-full cursor-pointer hover:bg-gray-200 transition-colors">
+                <span key={tag} className="text-[13px] bg-blue-50 text-blue-600 px-3.5 py-1 rounded-full font-medium cursor-pointer hover:bg-blue-100 transition-colors">
                   {tag}
                 </span>
               ))}
             </div>
             
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 border-t border-gray-200 pt-8">
+            <div className="flex items-center gap-12 sm:gap-20">
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">{stats.jobs}</h3>
-                <p className="text-sm text-gray-500">Jobs Posted</p>
+                <h3 className="text-3xl font-extrabold text-gray-900 mb-1">{stats.jobs}</h3>
+                <p className="text-sm text-gray-500 font-medium">Jobs Posted</p>
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">{stats.companies}</h3>
-                <p className="text-sm text-gray-500">Companies</p>
+                <h3 className="text-3xl font-extrabold text-gray-900 mb-1">{stats.companies}</h3>
+                <p className="text-sm text-gray-500 font-medium">Companies</p>
               </div>
               <div>
-                <h3 className="text-2xl font-bold text-gray-900">{stats.hires}</h3>
-                <p className="text-sm text-gray-500">Successful Hires</p>
+                <h3 className="text-3xl font-extrabold text-gray-900 mb-1">{stats.hires}</h3>
+                <p className="text-sm text-gray-500 font-medium">Successful Hires</p>
               </div>
             </div>
           </div>
           
-          {/* Right Image/Illustration area */}
-          <div className="relative hidden lg:block">
-            {/* The abstract shape blob background */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-brand-100/50 rounded-full blur-3xl -z-10"></div>
+          {/* Right UI Illustration Area */}
+          <div className="hidden lg:flex w-[45%] xl:w-1/2 relative h-[550px] xl:h-[650px] z-10 items-center justify-center">
             
-            <img 
-              src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" 
-              alt="Happy professional" 
-              className="rounded-3xl shadow-2xl object-cover h-[600px] w-full"
-            />
+            {/* Glowing Abstract Background Blobs */}
+            <div className="absolute top-1/4 right-1/4 w-72 h-72 bg-orange-400 rounded-full mix-blend-multiply filter blur-[80px] opacity-40 animate-pulse"></div>
+            <div className="absolute bottom-1/4 left-1/4 w-72 h-72 bg-brand-400 rounded-full mix-blend-multiply filter blur-[80px] opacity-40 animate-pulse" style={{animationDelay: '2s'}}></div>
             
-            {/* Floating Badges */}
-            <div className="absolute top-10 -left-10 bg-white p-4 rounded-xl shadow-xl flex items-center gap-4 animate-bounce" style={{animationDuration: '3s'}}>
-              <div className="bg-orange-100 p-2 rounded-lg text-brand-600"><Briefcase size={24} /></div>
-              <div><p className="font-bold text-sm text-gray-900">Build</p><p className="text-xs text-gray-500">Your Resume</p></div>
+            {/* Main Floating Job Card */}
+            <div className="relative bg-white/90 backdrop-blur-2xl p-8 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.08)] border border-white/60 max-w-[400px] w-full z-20 hover:-translate-y-2 transition-transform duration-500">
+               <div className="flex items-start justify-between mb-8">
+                  <div className="flex gap-4 items-center">
+                     <div className="w-16 h-16 bg-gradient-to-br from-brand-500 to-orange-400 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                       <Palette size={28} />
+                     </div>
+                     <div>
+                       <h3 className="text-xl font-bold text-gray-900 tracking-tight">Senior Product Designer</h3>
+                       <p className="text-brand-600 font-medium text-sm mt-1">InnovateTech Inc.</p>
+                     </div>
+                  </div>
+                  <span className="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full font-bold shadow-sm">New</span>
+               </div>
+               
+               <div className="flex flex-wrap gap-2 mb-8">
+                 <span className="bg-gray-50 border border-gray-100 text-gray-600 text-xs px-4 py-2 rounded-xl font-semibold flex items-center gap-1.5"><MapPin size={14}/> Remote</span>
+                 <span className="bg-gray-50 border border-gray-100 text-gray-600 text-xs px-4 py-2 rounded-xl font-semibold flex items-center gap-1.5"><Briefcase size={14}/> Full-time</span>
+                 <span className="bg-gray-50 border border-gray-100 text-gray-600 text-xs px-4 py-2 rounded-xl font-semibold">$120k - $150k</span>
+               </div>
+               
+               <div className="space-y-4 mb-8 opacity-70">
+                 <div className="h-2.5 bg-gray-100 rounded-full w-full"></div>
+                 <div className="h-2.5 bg-gray-100 rounded-full w-5/6"></div>
+                 <div className="h-2.5 bg-gray-100 rounded-full w-4/6"></div>
+               </div>
+               
+               <button className="w-full bg-[#111827] text-white py-4 rounded-xl font-bold hover:bg-brand-600 transition-colors shadow-md flex justify-center items-center gap-2">
+                 Quick Apply <ArrowRight size={18} />
+               </button>
             </div>
-            
-            <div className="absolute top-1/2 -right-12 bg-white p-4 rounded-xl shadow-xl flex items-center gap-4 animate-bounce" style={{animationDuration: '4s', animationDelay: '1s'}}>
-              <div className="bg-orange-100 p-2 rounded-lg text-brand-600"><Users size={24} /></div>
-              <div><p className="font-bold text-sm text-gray-900">Get</p><p className="text-xs text-gray-500">Noticed</p></div>
+
+            {/* Smaller Floating Element - Notifications */}
+            <div className="absolute top-[15%] right-0 bg-white p-4 rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.05)] border border-gray-50 flex items-center gap-4 z-30 animate-bounce" style={{animationDuration: '4s'}}>
+               <div className="bg-brand-50 p-3 rounded-full text-brand-600 relative">
+                 <Bell size={20} />
+                 <span className="absolute top-0 right-0 w-3 h-3 bg-red-500 border-2 border-white rounded-full"></span>
+               </div>
+               <div>
+                 <p className="font-bold text-sm text-gray-900">Job Alert Match</p>
+                 <p className="text-xs text-gray-500">2 mins ago</p>
+               </div>
             </div>
-            
-            <div className="absolute bottom-20 -left-6 bg-white p-4 rounded-xl shadow-xl flex flex-col gap-2 animate-bounce" style={{animationDuration: '3.5s', animationDelay: '0.5s'}}>
-              <div className="flex items-center justify-between">
-                <span className="font-bold text-sm text-gray-900">Join 1M+ Job Seekers</span>
-                <Users size={16} className="text-brand-600" />
-              </div>
-              <div className="flex -space-x-2">
-                {[1,2,3,4].map(i => (
-                  <img key={i} className="inline-block h-8 w-8 rounded-full ring-2 ring-white" src={`https://i.pravatar.cc/100?img=${i}`} alt=""/>
-                ))}
-                <div className="flex items-center justify-center h-8 w-8 rounded-full ring-2 ring-white bg-brand-500 text-white text-xs font-bold">+</div>
-              </div>
+
+            {/* Smaller Floating Element - Analytics */}
+            <div className="absolute bottom-[20%] -left-8 bg-white p-4 rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.05)] border border-gray-50 flex items-center gap-4 z-30 animate-bounce" style={{animationDuration: '5s', animationDelay: '1s'}}>
+               <div className="bg-orange-50 p-3 rounded-full text-brand-600">
+                 <TrendingUp size={20} />
+               </div>
+               <div>
+                 <p className="font-bold text-sm text-gray-900">Profile Views</p>
+                 <p className="text-xs text-brand-600 font-bold">+24% this week</p>
+               </div>
             </div>
-            
           </div>
+          
         </div>
       </div>
     </section>

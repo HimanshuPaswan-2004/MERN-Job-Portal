@@ -54,8 +54,6 @@ const AppContent = () => {
           </Route>
         </Routes>
       </main>
-      
-      {!isAuthPage && <Footer />}
     </div>
   );
 };
