@@ -51,7 +51,7 @@ export const createJob = async (req, res, next) => {
 // @access  Public
 export const getAllJobs = async (req, res, next) => {
   try {
-    const { search, location, jobType, experienceLevel, minSalary, maxSalary, page = 1, limit = 10 } = req.query;
+    const { search, location, jobType, experienceLevel, minSalary, maxSalary, page = 1, limit = 10, sortBy = 'latest' } = req.query;
 
     const query = { status: 'active' };
 
@@ -59,8 +59,16 @@ export const getAllJobs = async (req, res, next) => {
       query.$text = { $search: search };
     }
     if (location) query.location = { $regex: location, $options: 'i' };
-    if (jobType) query.jobType = jobType;
-    if (experienceLevel) query.experienceLevel = experienceLevel;
+    
+    if (jobType) {
+      const types = jobType.split(',').map(t => t.trim());
+      query.jobType = { $in: types };
+    }
+    
+    if (experienceLevel) {
+      const levels = experienceLevel.split(',').map(t => t.trim());
+      query.experienceLevel = { $in: levels };
+    }
     
     if (minSalary || maxSalary) {
       query.salary = {};
@@ -68,13 +76,17 @@ export const getAllJobs = async (req, res, next) => {
       if (maxSalary) query.salary['min'] = { $lte: Number(maxSalary) };
     }
 
+    let sortOption = { createdAt: -1 };
+    if (sortBy === 'oldest') sortOption = { createdAt: 1 };
+    else if (sortBy === 'salary') sortOption = { 'salary.min': -1 };
+
     const skip = (Number(page) - 1) * Number(limit);
 
     const jobs = await Job.find(query)
       .populate('company', 'name logo location industry')
       .skip(skip)
       .limit(Number(limit))
-      .sort({ createdAt: -1 });
+      .sort(sortOption);
 
     const totalJobs = await Job.countDocuments(query);
 

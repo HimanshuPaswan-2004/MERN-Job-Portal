@@ -9,6 +9,7 @@ import CompanyForm from './pages/CompanyForm';
 import MyJobs from './pages/MyJobs';
 import JobForm from './pages/JobForm';
 import Home from './pages/Home';
+import Jobs from './pages/Jobs';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
@@ -32,6 +33,7 @@ const AppContent = () => {
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/jobs" element={<Jobs />} />
           
           {/* Auth routes without MainLayout (they are full screen themselves) */}
           <Route path="/signup" element={<Signup />} />
