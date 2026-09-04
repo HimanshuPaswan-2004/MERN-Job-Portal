@@ -158,20 +158,58 @@ const Jobs = () => {
   return (
     <div className="bg-[#fcf9f2] min-h-screen pb-20">
       {/* Hero Header */}
-      <div className="bg-gradient-to-r from-brand-50 via-orange-50 to-white pt-16 pb-16 border-b border-brand-100/50 relative overflow-hidden">
-        {/* Subtle decorative background blobs */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-brand-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-30 translate-x-1/3 -translate-y-1/3"></div>
-        <div className="absolute bottom-0 left-10 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-[80px] opacity-30 -translate-x-1/3 translate-y-1/3"></div>
+      <div className="bg-[#FEF3E8] pt-16 pb-0 border-b border-[#FEF3E8] relative overflow-hidden flex items-end min-h-[280px]">
         
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl lg:text-[3.5rem] font-black text-gray-900 tracking-tight leading-tight mb-4">
-              Explore <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-600 to-orange-500">Jobs</span>
+        {/* Background shapes */}
+        <div className="absolute top-4 right-1/4 w-40 h-40 bg-orange-200/50 rounded-full mix-blend-multiply blur-2xl"></div>
+        <div className="absolute top-12 right-10 w-24 h-24 bg-brand-200/50 rounded-full mix-blend-multiply blur-xl"></div>
+        
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 h-full flex flex-col md:flex-row items-end justify-between pb-8">
+          
+          {/* Left Text */}
+          <div className="max-w-md w-full md:w-1/3 pb-4">
+            <h1 className="text-[3rem] font-black text-[#1A1A2E] tracking-tight leading-tight mb-2">
+              Explore <span className="text-brand-600">Jobs</span>
             </h1>
-            <p className="text-lg md:text-xl text-gray-600 font-medium max-w-xl leading-relaxed">
-              Find the right job, right now. Browse thousands of opportunities and accelerate your career.
-            </p>
+            <p className="text-xl text-gray-600 font-medium">Find the right job, right now.</p>
           </div>
+
+          {/* Middle Handwriting Text */}
+          <div className="hidden lg:block w-1/4 pb-12 pl-8">
+            <div className="transform -rotate-6">
+              <p className="text-2xl font-caveat text-gray-700 leading-tight" style={{ fontFamily: "'Caveat', cursive", fontWeight: 700 }}>
+                Better<br/>Jobs<br/>Brighter<br/>Future
+              </p>
+              <div className="h-1 w-20 bg-orange-500 rounded-full mt-1 ml-4 -rotate-2"></div>
+            </div>
+          </div>
+          
+          {/* Middle Image */}
+          <div className="hidden md:block absolute bottom-0 left-1/2 transform -translate-x-[20%] lg:-translate-x-1/2 w-80 lg:w-[450px]">
+             <img 
+               src="/hero-girl.jpg" 
+               alt="Professional Woman" 
+               className="w-full object-cover mix-blend-multiply" 
+               style={{ maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%)', WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%)' }}
+             />
+          </div>
+
+          {/* Right Quote */}
+          <div className="hidden md:block w-1/3 text-right pb-16 pr-8 z-20">
+             <div className="relative inline-block text-left">
+               <span className="absolute -top-6 -left-8 text-5xl font-serif text-brand-500 font-bold">"</span>
+               <p className="text-2xl font-caveat text-gray-700 leading-tight italic font-semibold" style={{ fontFamily: "'Caveat', cursive" }}>
+                 Opportunities<br/>don't happen,<br/>you create them."
+               </p>
+               <div className="absolute -bottom-4 right-0">
+                  <svg width="40" height="15" viewBox="0 0 40 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M2 13C12.5 4 25.5 2 38 4" stroke="#f97316" strokeWidth="3" strokeLinecap="round"/>
+                    <path d="M30 11C32.5 10 35.5 8 38 4" stroke="#f97316" strokeWidth="3" strokeLinecap="round"/>
+                  </svg>
+               </div>
+             </div>
+          </div>
+          
         </div>
       </div>
 
