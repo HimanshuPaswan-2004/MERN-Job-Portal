@@ -420,51 +420,52 @@ const Jobs = () => {
                       )}
                     </div>
                     
-                    {/* Job Details */}
-                    <div className="flex-grow">
-                      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4 mb-3">
-                        <div>
-                          <Link to={`/jobs/${job._id}`} className="text-xl font-bold text-gray-900 group-hover:text-brand-600 transition-colors line-clamp-1">
+                    {/* Content Area */}
+                    <div className="flex-grow flex flex-col md:flex-row justify-between gap-4">
+                       
+                       {/* Left Side (Details) */}
+                       <div className="flex-grow">
+                          <Link to={`/jobs/${job._id}`} className="text-xl font-bold text-gray-900 group-hover:text-brand-600 transition-colors line-clamp-1 mb-1">
                             {job.title}
                           </Link>
-                          <p className="text-gray-600 text-sm mt-1 font-medium">{job.company?.name || 'Unknown Company'}</p>
-                        </div>
-                        <div className="flex items-center gap-4 flex-shrink-0">
-                          <span className="text-xs font-medium text-gray-500 hidden sm:block">{getTimeAgo(job.createdAt)}</span>
-                          <button className="text-gray-400 hover:text-brand-600 transition-colors p-1">
-                            <Bookmark size={20} />
-                          </button>
-                        </div>
-                      </div>
-                      
-                      {/* Meta Info */}
-                      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mb-4 text-sm text-gray-500 font-medium">
-                        <span className="flex items-center gap-1.5"><MapPin size={16}/> {job.location}</span>
-                        <span className="flex items-center gap-1.5"><Briefcase size={16}/> {jobTypeOptions.find(o => o.value === job.jobType)?.label || job.jobType}</span>
-                        <span className="flex items-center gap-1.5"><Clock size={16}/> {experienceOptions.find(o => o.value === job.experienceLevel)?.label || job.experienceLevel}</span>
-                        <span className="flex items-center gap-1.5 text-gray-700">₹ {formatSalary(job.salary?.min, job.salary?.max)}</span>
-                      </div>
-                      
-                      {/* Tags & Action */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-2">
-                        <div className="flex flex-wrap gap-2">
-                          {job.skills?.slice(0, 4).map((skill, idx) => (
-                            <span key={idx} className="bg-orange-50 text-brand-700 text-xs font-semibold px-3 py-1 rounded-full border border-orange-100">
-                              {skill}
-                            </span>
-                          ))}
-                          {job.skills?.length > 4 && (
-                            <span className="bg-gray-50 text-gray-600 border border-gray-200 text-xs font-medium px-2 py-1 rounded-full">+{job.skills.length - 4}</span>
-                          )}
-                        </div>
-                        <div className="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto mt-4 sm:mt-0">
-                           <span className="text-xs font-medium text-gray-500 sm:hidden">{getTimeAgo(job.createdAt)}</span>
-                           <Link to={`/jobs/${job._id}`} className="bg-brand-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-brand-700 transition-colors shadow-sm text-sm text-center">
-                             Apply Now
-                           </Link>
-                        </div>
-                      </div>
-                      
+                          <p className="text-gray-600 text-sm mb-4 font-medium">{job.company?.name || 'Unknown Company'}</p>
+                          
+                          {/* Meta Info */}
+                          <div className="flex flex-wrap items-center gap-x-5 gap-y-2 mb-4 text-sm text-gray-500 font-medium">
+                            <span className="flex items-center gap-1.5"><MapPin size={16}/> {job.location}</span>
+                            <span className="flex items-center gap-1.5"><Briefcase size={16}/> {jobTypeOptions.find(o => o.value === job.jobType)?.label || job.jobType}</span>
+                            <span className="flex items-center gap-1.5"><Clock size={16}/> {experienceOptions.find(o => o.value === job.experienceLevel)?.label || job.experienceLevel}</span>
+                            <span className="flex items-center gap-1.5 text-gray-700">₹ {formatSalary(job.salary?.min, job.salary?.max)}</span>
+                          </div>
+                          
+                          {/* Tags */}
+                          <div className="flex flex-wrap gap-2">
+                            {job.skills?.slice(0, 4).map((skill, idx) => (
+                              <span key={idx} className="bg-orange-50 text-brand-700 text-xs font-semibold px-3 py-1.5 rounded-full border border-orange-100">
+                                {skill}
+                              </span>
+                            ))}
+                            {job.skills?.length > 4 && (
+                              <span className="bg-gray-50 text-gray-600 border border-gray-200 text-xs font-medium px-2.5 py-1.5 rounded-full">+{job.skills.length - 4}</span>
+                            )}
+                          </div>
+                       </div>
+
+                       {/* Right Side (Actions) */}
+                       <div className="flex md:flex-col justify-between items-center md:items-end md:min-w-[140px] border-t md:border-t-0 border-gray-100 pt-4 md:pt-0 mt-2 md:mt-0">
+                          <div className="flex items-center gap-3">
+                             <span className="text-xs font-medium text-gray-500">{getTimeAgo(job.createdAt)}</span>
+                             <button className="text-gray-400 hover:text-brand-600 transition-colors">
+                               <Bookmark size={20} />
+                             </button>
+                          </div>
+                          <div className="md:mt-auto">
+                            <Link to={`/jobs/${job._id}`} className="bg-brand-600 text-white font-bold py-2.5 px-6 rounded-xl hover:bg-brand-700 transition-colors shadow-sm text-sm text-center inline-block w-full">
+                              Apply Now
+                            </Link>
+                          </div>
+                       </div>
+                       
                     </div>
                   </div>
                 ))}
