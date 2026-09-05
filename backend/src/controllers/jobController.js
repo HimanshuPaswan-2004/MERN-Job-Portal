@@ -70,11 +70,8 @@ export const getAllJobs = async (req, res, next) => {
       query.experienceLevel = { $in: levels };
     }
     
-    if (minSalary || maxSalary) {
-      query.salary = {};
-      if (minSalary) query.salary['max'] = { $gte: Number(minSalary) };
-      if (maxSalary) query.salary['min'] = { $lte: Number(maxSalary) };
-    }
+    if (minSalary) query['salary.max'] = { $gte: Number(minSalary) };
+    if (maxSalary) query['salary.min'] = { $lte: Number(maxSalary) };
 
     let sortOption = { createdAt: -1 };
     if (sortBy === 'oldest') sortOption = { createdAt: 1 };

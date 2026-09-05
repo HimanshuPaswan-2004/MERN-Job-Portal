@@ -189,8 +189,7 @@ const Jobs = () => {
              <img 
                src="/hero-girl.jpg" 
                alt="Professional Woman" 
-               className="w-full object-cover mix-blend-multiply" 
-               style={{ maskImage: 'linear-gradient(to top, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%)', WebkitMaskImage: 'linear-gradient(to top, rgba(0,0,0,1) 80%, rgba(0,0,0,0) 100%)' }}
+               className="w-full object-contain mix-blend-multiply drop-shadow-sm max-h-[350px]" 
              />
           </div>
 
@@ -227,12 +226,12 @@ const Jobs = () => {
            </button>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8">
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
           
           {/* Left Sidebar - Filters */}
-          <div className={`lg:w-[280px] xl:w-[320px] flex-shrink-0 ${isMobileFiltersOpen ? 'fixed inset-0 z-50 bg-white p-6 overflow-y-auto' : 'hidden lg:block'}`}>
+          <div className={`lg:w-[280px] xl:w-[320px] flex-shrink-0 ${isMobileFiltersOpen ? 'fixed inset-0 z-50 bg-white p-6 overflow-y-auto' : 'hidden lg:block sticky top-24'}`}>
             
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
               
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-bold text-gray-900">Filters</h3>
