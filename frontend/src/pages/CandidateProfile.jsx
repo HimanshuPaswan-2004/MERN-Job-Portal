@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { 
-  MapPin, Phone, Mail, Link, Camera, CheckCircle2, Circle, 
+  MapPin, Phone, Mail, Link as LinkIcon, Camera, CheckCircle2, Circle, 
   FileText, Download, Upload, Trash2, Edit2, Plus
 } from 'lucide-react';
 
@@ -115,15 +116,15 @@ const CandidateProfile = () => {
                   <span className="flex items-center gap-1"><MapPin size={14}/> {user?.location || 'Add Location'}</span>
                   <span className="flex items-center gap-1"><Phone size={14}/> {user?.phone || 'Add Phone'}</span>
                   <span className="flex items-center gap-1"><Mail size={14}/> {user?.email}</span>
-                  <span className="flex items-center gap-1"><Link size={14}/> {user?.linkedin || 'linkedin.com/in/...'}</span>
+                  <span className="flex items-center gap-1"><LinkIcon size={14}/> {user?.linkedin || 'linkedin.com/in/...'}</span>
                </div>
             </div>
          </div>
          
          <div className="mt-4 md:mt-0 relative z-10 shrink-0 self-start md:self-auto">
-            <button className="bg-brand-600 hover:bg-brand-700 text-white font-bold py-2 px-6 rounded-lg text-sm transition-colors flex items-center gap-2 shadow-sm">
+            <Link to="/candidate/profile/edit" className="bg-brand-600 hover:bg-brand-700 text-white font-bold py-2 px-6 rounded-lg text-sm transition-colors flex items-center gap-2 shadow-sm inline-flex">
                <Edit2 size={16}/> Edit Profile
-            </button>
+            </Link>
          </div>
 
          {/* Abstract background graphics */}
