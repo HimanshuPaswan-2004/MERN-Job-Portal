@@ -8,6 +8,7 @@ import {
   updateJobStatus,
   deleteJob,
   getStats,
+  getSimilarJobs
 } from '../controllers/jobController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
@@ -17,6 +18,7 @@ router.get('/', getAllJobs);
 router.get('/stats', getStats);
 router.get('/my', protect, authorize('recruiter'), getMyJobs);
 router.get('/:id', getJobById);
+router.get('/:id/similar', getSimilarJobs);
 
 router.post('/', protect, authorize('recruiter'), createJob);
 router.put('/:id', protect, authorize('recruiter'), updateJob);

@@ -259,3 +259,37 @@ export const getStats = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get similar jobs based on skills or category
+// @route   GET /api/jobs/:id/similar
+// @access  Public
+export const getSimilarJobs = async (req, res, next) => {
+  try {
+    const job = await Job.findById(req.params.id);
+    
+    if (!job) {
+      res.status(404);
+      throw new Error('Job not found');
+    }
+
+    // Find jobs with overlapping skills or same category, but exclude the current job
+    const similarJobs = await Job.find({
+      _id: { $ne: job._id }, // Exclude current job
+      status: 'active',
+      $or: [
+        { skills: { $in: job.skills } },
+        { jobType: job.jobType }
+      ]
+    })
+      .populate('company', 'name logo location industry')
+      .limit(4)
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: similarJobs,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

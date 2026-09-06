@@ -10,6 +10,7 @@ import MyJobs from './pages/MyJobs';
 import JobForm from './pages/JobForm';
 import Home from './pages/Home';
 import Jobs from './pages/Jobs';
+import JobDetails from './pages/JobDetails';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 
@@ -34,6 +35,7 @@ const AppContent = () => {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/jobs" element={<Jobs />} />
+          <Route path="/jobs/:id" element={<JobDetails />} />
           
           {/* Auth routes without MainLayout (they are full screen themselves) */}
           <Route path="/signup" element={<Signup />} />

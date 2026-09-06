@@ -226,12 +226,12 @@ const Jobs = () => {
            </button>
         </div>
 
-        <div className="flex flex-col lg:flex-row gap-8 items-start">
+        <div className="flex flex-col lg:flex-row gap-8">
           
           {/* Left Sidebar - Filters */}
-          <div className={`lg:w-[280px] xl:w-[320px] flex-shrink-0 ${isMobileFiltersOpen ? 'fixed inset-0 z-50 bg-white p-6 overflow-y-auto' : 'hidden lg:block sticky top-24 h-[calc(100vh-8rem)] overflow-y-auto rounded-2xl'}`} style={{ scrollbarWidth: 'none' }}>
+          <div className={`lg:w-[280px] xl:w-[320px] flex-shrink-0 ${isMobileFiltersOpen ? 'fixed inset-0 z-50 bg-white p-6 overflow-y-auto' : 'hidden lg:block'}`}>
             
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 min-h-full">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-24 h-[calc(100vh-8rem)] overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
               
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-bold text-gray-900">Filters</h3>
