@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { 
-  MapPin, Phone, Mail, Linkedin, Camera, CheckCircle2, Circle, 
+  MapPin, Phone, Mail, Link, Camera, CheckCircle2, Circle, 
   FileText, Download, Upload, Trash2, Edit2, Plus
 } from 'lucide-react';
 
@@ -115,7 +115,7 @@ const CandidateProfile = () => {
                   <span className="flex items-center gap-1"><MapPin size={14}/> {user?.location || 'Add Location'}</span>
                   <span className="flex items-center gap-1"><Phone size={14}/> {user?.phone || 'Add Phone'}</span>
                   <span className="flex items-center gap-1"><Mail size={14}/> {user?.email}</span>
-                  <span className="flex items-center gap-1"><Linkedin size={14}/> {user?.linkedin || 'linkedin.com/in/...'}</span>
+                  <span className="flex items-center gap-1"><Link size={14}/> {user?.linkedin || 'linkedin.com/in/...'}</span>
                </div>
             </div>
          </div>
