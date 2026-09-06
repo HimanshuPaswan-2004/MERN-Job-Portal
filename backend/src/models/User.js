@@ -38,6 +38,19 @@ const userSchema = new mongoose.Schema({
   profilePhoto: {
     type: String,
   },
+  dateOfBirth: {
+    type: Date,
+  },
+  gender: {
+    type: String,
+    enum: ['Male', 'Female', 'Other', 'Prefer not to say'],
+  },
+  linkedin: {
+    type: String,
+  },
+  tagline: {
+    type: String,
+  },
   skills: {
     type: [String],
     default: [],

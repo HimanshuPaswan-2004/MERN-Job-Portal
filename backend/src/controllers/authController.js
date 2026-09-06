@@ -99,3 +99,46 @@ export const getCurrentUser = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Update user profile
+// @route   PUT /api/auth/me
+// @access  Private
+export const updateProfile = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+
+    if (user) {
+      user.name = req.body.name || user.name;
+      user.email = req.body.email || user.email;
+      user.phone = req.body.phone || user.phone;
+      user.location = req.body.location || user.location;
+      user.bio = req.body.bio || user.bio;
+      user.dateOfBirth = req.body.dateOfBirth || user.dateOfBirth;
+      user.gender = req.body.gender || user.gender;
+      user.linkedin = req.body.linkedin || user.linkedin;
+      user.tagline = req.body.tagline || user.tagline;
+      user.profilePhoto = req.body.profilePhoto || user.profilePhoto;
+      
+      // Update arrays if provided
+      if (req.body.skills) user.skills = req.body.skills;
+      if (req.body.education) user.education = req.body.education;
+      if (req.body.experience) user.experience = req.body.experience;
+      if (req.body.resume) user.resume = req.body.resume;
+
+      const updatedUser = await user.save();
+
+      res.json({
+        success: true,
+        message: 'Profile updated successfully',
+        data: {
+          user: updatedUser
+        }
+      });
+    } else {
+      res.status(404);
+      throw new Error('User not found');
+    }
+  } catch (error) {
+    next(error);
+  }
+};

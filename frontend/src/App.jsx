@@ -4,6 +4,7 @@ import Signup from './pages/Signup';
 import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import CandidateDashboard from './pages/CandidateDashboard';
+import CandidateProfile from './pages/CandidateProfile';
 import RecruiterDashboard from './pages/RecruiterDashboard';
 import MyCompanies from './pages/MyCompanies';
 import CompanyForm from './pages/CompanyForm';
@@ -18,22 +19,26 @@ import Footer from './components/Footer';
 // Dummy components for now
 import { Home as HomeIcon, Search, FileText, User as UserIcon, FileCode, Bookmark, Bell, Settings, LogOut, Briefcase } from 'lucide-react';
 
-const SidebarItem = ({ icon, label, active }) => (
-  <Link to="#" className={`flex items-center gap-3 px-4 py-3 rounded-xl mb-1 transition-colors ${active ? 'bg-orange-50 text-brand-600 font-bold' : 'text-gray-600 font-medium hover:bg-gray-50 hover:text-brand-600'}`}>
+const SidebarItem = ({ icon, label, to, isActive }) => (
+  <Link to={to || "#"} className={`flex items-center gap-3 px-4 py-3 rounded-xl mb-1 transition-colors ${isActive ? 'bg-orange-50 text-brand-600 font-bold' : 'text-gray-600 font-medium hover:bg-gray-50 hover:text-brand-600'}`}>
     {icon}
     <span>{label}</span>
   </Link>
 );
 
-const CandidateLayout = ({ children }) => (
+const CandidateLayout = ({ children }) => {
+  const location = useLocation();
+  const isActive = (path) => location.pathname === path;
+  
+  return (
   <div className="flex min-h-screen bg-[#fcf9f2]">
     {/* Sidebar */}
     <aside className="w-64 bg-white border-r border-gray-100 flex-shrink-0 flex flex-col fixed h-full z-10 pt-20">
       <div className="p-4 flex-grow overflow-y-auto">
-        <SidebarItem icon={<HomeIcon size={20}/>} label="Dashboard" active={true} />
-        <SidebarItem icon={<Search size={20}/>} label="Browse Jobs" />
-        <SidebarItem icon={<FileText size={20}/>} label="My Applications" />
-        <SidebarItem icon={<UserIcon size={20}/>} label="My Profile" />
+        <SidebarItem icon={<HomeIcon size={20}/>} label="Dashboard" to="/candidate/dashboard" isActive={isActive('/candidate/dashboard') || isActive('/candidates/dashboard')} />
+        <SidebarItem icon={<Search size={20}/>} label="Browse Jobs" to="/jobs" isActive={isActive('/jobs')} />
+        <SidebarItem icon={<FileText size={20}/>} label="My Applications" to="#" isActive={isActive('/candidate/applications')} />
+        <SidebarItem icon={<UserIcon size={20}/>} label="My Profile" to="/candidate/profile" isActive={isActive('/candidate/profile')} />
         <SidebarItem icon={<FileCode size={20}/>} label="Resume" />
         <SidebarItem icon={<Bookmark size={20}/>} label="Saved Jobs" />
         <SidebarItem icon={<Bell size={20}/>} label="Job Alerts" />
@@ -60,7 +65,8 @@ const CandidateLayout = ({ children }) => (
       </div>
     </main>
   </div>
-);
+  );
+};
 
 const MainLayout = ({ children }) => (
   <div className="container mx-auto px-4 py-8">
@@ -90,6 +96,7 @@ const AppContent = () => {
           <Route element={<ProtectedRoute allowedRoles={['candidate']} />}>
             <Route path="/candidate/dashboard" element={<CandidateLayout><CandidateDashboard /></CandidateLayout>} />
             <Route path="/candidates/dashboard" element={<CandidateLayout><CandidateDashboard /></CandidateLayout>} />
+            <Route path="/candidate/profile" element={<CandidateLayout><CandidateProfile /></CandidateLayout>} />
           </Route>
           
           {/* Recruiter Protected Routes */}
