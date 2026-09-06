@@ -8,6 +8,7 @@ import { errorHandler, notFound } from './src/middleware/errorMiddleware.js';
 import authRoutes from './src/routes/authRoutes.js';
 import companyRoutes from './src/routes/companyRoutes.js';
 import jobRoutes from './src/routes/jobRoutes.js';
+import applicationRoutes from './src/routes/applicationRoutes.js';
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/auth', authRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/jobs', jobRoutes);
+app.use('/api/applications', applicationRoutes);
 
 app.get('/', (req, res) => {
   res.send('JobPortal API is running...');
