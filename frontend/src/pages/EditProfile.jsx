@@ -4,7 +4,8 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import { 
   User, Briefcase, GraduationCap, Link as LinkIcon, Settings,
-  Camera, CheckCircle2, Circle, Lightbulb, Eye, BarChart2
+  Camera, CheckCircle2, Circle, Lightbulb, Eye, BarChart2,
+  MapPin, FileText
 } from 'lucide-react';
 
 const EditProfile = () => {
