@@ -112,11 +112,15 @@ export const updateProfile = async (req, res, next) => {
       user.email = req.body.email || user.email;
       user.phone = req.body.phone || user.phone;
       user.location = req.body.location || user.location;
-      user.bio = req.body.bio || user.bio;
-      user.dateOfBirth = req.body.dateOfBirth || user.dateOfBirth;
+      user.bio = req.body.bio !== undefined ? req.body.bio : user.bio;
+      user.dateOfBirth = req.body.dateOfBirth ? req.body.dateOfBirth : (req.body.dateOfBirth === '' ? null : user.dateOfBirth);
       user.gender = req.body.gender || user.gender;
       user.linkedin = req.body.linkedin || user.linkedin;
+      user.github = req.body.github || user.github;
+      user.portfolio = req.body.portfolio || user.portfolio;
       user.tagline = req.body.tagline || user.tagline;
+      user.preferredJobType = req.body.preferredJobType || user.preferredJobType;
+      user.expectedSalary = req.body.expectedSalary || user.expectedSalary;
       user.profilePhoto = req.body.profilePhoto || user.profilePhoto;
       
       // Update arrays if provided

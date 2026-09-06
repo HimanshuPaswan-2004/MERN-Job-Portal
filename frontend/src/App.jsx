@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import ProtectedRoute from './components/ProtectedRoute';
 import CandidateDashboard from './pages/CandidateDashboard';
 import CandidateProfile from './pages/CandidateProfile';
+import EditProfile from './pages/EditProfile';
 import RecruiterDashboard from './pages/RecruiterDashboard';
 import MyCompanies from './pages/MyCompanies';
 import CompanyForm from './pages/CompanyForm';
@@ -97,6 +98,7 @@ const AppContent = () => {
             <Route path="/candidate/dashboard" element={<CandidateLayout><CandidateDashboard /></CandidateLayout>} />
             <Route path="/candidates/dashboard" element={<CandidateLayout><CandidateDashboard /></CandidateLayout>} />
             <Route path="/candidate/profile" element={<CandidateLayout><CandidateProfile /></CandidateLayout>} />
+            <Route path="/candidate/profile/edit" element={<CandidateLayout><EditProfile /></CandidateLayout>} />
           </Route>
           
           {/* Recruiter Protected Routes */}

@@ -48,7 +48,20 @@ const userSchema = new mongoose.Schema({
   linkedin: {
     type: String,
   },
+  github: {
+    type: String,
+  },
+  portfolio: {
+    type: String,
+  },
   tagline: {
+    type: String,
+  },
+  preferredJobType: {
+    type: String,
+    enum: ['Full Time', 'Part Time', 'Contract', 'Internship', 'Freelance'],
+  },
+  expectedSalary: {
     type: String,
   },
   skills: {
