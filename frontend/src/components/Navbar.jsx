@@ -10,9 +10,9 @@ const Navbar = () => {
   const navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Jobs', path: '/jobs' },
-    { name: 'Companies', path: '/companies' },
-    { name: 'For Candidates', path: '/candidates' },
-    { name: 'For Recruiters', path: '/recruiters' },
+    { name: 'Companies', path: '/recruiter/companies' },
+    { name: 'For Candidates', path: '/candidate/dashboard' },
+    { name: 'For Recruiters', path: '/recruiter/dashboard' },
     { name: 'About', path: '/about' },
   ];
 
