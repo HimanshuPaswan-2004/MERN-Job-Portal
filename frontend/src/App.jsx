@@ -16,6 +16,7 @@ import Jobs from './pages/Jobs';
 import JobDetails from './pages/JobDetails';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import MyApplications from './pages/MyApplications';
 
 // Dummy components for now
 import { Home as HomeIcon, Search, FileText, User as UserIcon, FileCode, Bookmark, Bell, Settings, LogOut, Briefcase } from 'lucide-react';
@@ -38,7 +39,7 @@ const CandidateLayout = ({ children }) => {
       <div className="p-4 flex-grow overflow-y-auto">
         <SidebarItem icon={<HomeIcon size={20}/>} label="Dashboard" to="/candidate/dashboard" isActive={isActive('/candidate/dashboard') || isActive('/candidates/dashboard')} />
         <SidebarItem icon={<Search size={20}/>} label="Browse Jobs" to="/jobs" isActive={isActive('/jobs')} />
-        <SidebarItem icon={<FileText size={20}/>} label="My Applications" to="#" isActive={isActive('/candidate/applications')} />
+        <SidebarItem icon={<FileText size={20}/>} label="My Applications" to="/candidate/applications" isActive={isActive('/candidate/applications')} />
         <SidebarItem icon={<UserIcon size={20}/>} label="My Profile" to="/candidate/profile" isActive={isActive('/candidate/profile')} />
         <SidebarItem icon={<FileCode size={20}/>} label="Resume" />
         <SidebarItem icon={<Bookmark size={20}/>} label="Saved Jobs" />
@@ -99,6 +100,7 @@ const AppContent = () => {
             <Route path="/candidates/dashboard" element={<CandidateLayout><CandidateDashboard /></CandidateLayout>} />
             <Route path="/candidate/profile" element={<CandidateLayout><CandidateProfile /></CandidateLayout>} />
             <Route path="/candidate/profile/edit" element={<CandidateLayout><EditProfile /></CandidateLayout>} />
+            <Route path="/candidate/applications" element={<CandidateLayout><MyApplications /></CandidateLayout>} />
           </Route>
           
           {/* Recruiter Protected Routes */}
