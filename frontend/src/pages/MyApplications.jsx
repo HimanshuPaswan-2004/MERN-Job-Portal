@@ -1,102 +1,156 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ChevronDown, ChevronRight, SlidersHorizontal, MapPin, Briefcase, IndianRupee, Clock, Bell, Info } from 'lucide-react';
-
-// Static Data based on Mockup
-const applications = [
-  {
-    id: 1,
-    title: 'Software Engineer',
-    company: 'Google',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/Google_%22G%22_Logo.svg',
-    location: 'Bangalore, India',
-    type: 'Full Time',
-    experience: '2 - 4 Years',
-    salary: '₹25 - 40 LPA',
-    status: 'In Review',
-    appliedDate: '12 Aug 2025'
-  },
-  {
-    id: 2,
-    title: 'Frontend Developer',
-    company: 'Microsoft',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg',
-    location: 'Hyderabad, India',
-    type: 'Full Time',
-    experience: '1 - 3 Years',
-    salary: '₹18 - 32 LPA',
-    status: 'Shortlisted',
-    appliedDate: '05 Aug 2025'
-  },
-  {
-    id: 3,
-    title: 'Backend Developer',
-    company: 'Amazon',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg',
-    location: 'Bangalore, India',
-    type: 'Full Time',
-    experience: '2 - 5 Years',
-    salary: '₹20 - 35 LPA',
-    status: 'Applied',
-    appliedDate: '28 Jul 2025'
-  },
-  {
-    id: 4,
-    title: 'Product Designer',
-    company: 'Adobe',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/4/4c/Adobe_Systems_logo_and_wordmark.svg',
-    location: 'Noida, India',
-    type: 'Full Time',
-    experience: '2 - 4 Years',
-    salary: '₹15 - 28 LPA',
-    status: 'Offered',
-    appliedDate: '14 Jul 2025'
-  },
-  {
-    id: 5,
-    title: 'Data Scientist',
-    company: 'Swiggy',
-    logo: 'https://upload.wikimedia.org/wikipedia/en/1/12/Swiggy_logo.svg',
-    location: 'Bangalore, India',
-    type: 'Full Time',
-    experience: '2 - 5 Years',
-    salary: '₹18 - 30 LPA',
-    status: 'Rejected',
-    appliedDate: '02 Jul 2025'
-  }
-];
-
-const statsData = [
-  { label: 'Applied', count: 3, color: 'bg-blue-500' },
-  { label: 'In Review', count: 2, color: 'bg-orange-700' },
-  { label: 'Shortlisted', count: 2, color: 'bg-purple-500' },
-  { label: 'Interview', count: 1, color: 'bg-orange-400' },
-  { label: 'Offered', count: 1, color: 'bg-green-500' },
-  { label: 'Rejected', count: 2, color: 'bg-red-500' }
-];
+import axios from 'axios';
 
 const getStatusStyles = (status) => {
   switch (status) {
-    case 'In Review': return 'bg-green-50 text-green-600 border-green-100';
+    case 'In Review': return 'bg-orange-50 text-orange-600 border-orange-100';
     case 'Shortlisted': return 'bg-purple-50 text-purple-600 border-purple-100';
     case 'Applied': return 'bg-blue-50 text-blue-600 border-blue-100';
-    case 'Offered': return 'bg-green-50 text-green-600 border-green-100';
+    case 'Offered': 
+    case 'Hired': return 'bg-green-50 text-green-600 border-green-100';
     case 'Rejected': return 'bg-red-50 text-red-600 border-red-100';
+    case 'Interview': return 'bg-yellow-50 text-yellow-600 border-yellow-100';
     default: return 'bg-gray-50 text-gray-600 border-gray-100';
   }
 };
 
+const formatSalary = (salary) => {
+  if (!salary) return 'Not Disclosed';
+  if (typeof salary === 'string') return salary;
+  const { min, max } = salary;
+  if (!min && !max) return 'Not Disclosed';
+  if (!min) return `Upto ₹${max/100000} LPA`;
+  if (!max) return `₹${min/100000}+ LPA`;
+  return `₹${min/100000} - ${max/100000} LPA`;
+};
+
+const formatDate = (dateString) => {
+  const options = { day: '2-digit', month: 'short', year: 'numeric' };
+  return new Date(dateString).toLocaleDateString('en-GB', options);
+};
+
 const MyApplications = () => {
+  const [applications, setApplications] = useState([]);
+  const [stats, setStats] = useState({ total: 0, applied: 0, inReview: 0, shortlisted: 0, interview: 0, offered: 0, rejected: 0 });
+  const [loading, setLoading] = useState(true);
+
+  // Filters
   const [activeFilter, setActiveFilter] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('All Status');
+  const [jobTypeFilter, setJobTypeFilter] = useState('All Job Type');
+  const [sortBy, setSortBy] = useState('latest');
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const res = await axios.get('/api/applications');
+        if (res.data.success) {
+          setApplications(res.data.data.applications);
+          setStats(res.data.data.stats);
+        }
+      } catch (error) {
+        console.error("Error fetching applications", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchApplications();
+  }, []);
+
+  // Calculate Chart Offsets dynamically
+  const calculateDashOffset = (count, total) => {
+    if (total === 0) return 251.2; // full offset (empty circle)
+    const circumference = 251.2; // 2 * pi * r (r=40)
+    const fraction = count / total;
+    return circumference * (1 - fraction);
+  };
+
+  const calculateRotation = (index, allStats) => {
+     let prevFraction = 0;
+     for(let i=0; i<index; i++) {
+        prevFraction += allStats[i].count / (stats.total || 1);
+     }
+     return (prevFraction * 360) - 90; // -90 to start from top
+  };
+
+  const chartData = [
+    { label: 'Applied', count: stats.applied, color: '#3b82f6', bgClass: 'bg-blue-500' },
+    { label: 'In Review', count: stats.inReview, color: '#c2410c', bgClass: 'bg-orange-700' },
+    { label: 'Shortlisted', count: stats.shortlisted, color: '#8b5cf6', bgClass: 'bg-purple-500' },
+    { label: 'Interview', count: stats.interview, color: '#fb923c', bgClass: 'bg-orange-400' },
+    { label: 'Offered', count: stats.offered, color: '#22c55e', bgClass: 'bg-green-500' },
+    { label: 'Rejected', count: stats.rejected, color: '#ef4444', bgClass: 'bg-red-500' }
+  ];
+
+  // Client-side filtering
+  let filteredApps = applications.filter(app => {
+    let match = true;
+    
+    // Top tabs filter
+    if (activeFilter !== 'All') {
+      if (activeFilter === 'Offered' && app.status === 'Hired') {
+        // match
+      } else if (app.status !== activeFilter) {
+        match = false;
+      }
+    }
+
+    // Search query
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      const titleMatch = app.job?.title?.toLowerCase().includes(q);
+      const companyMatch = app.job?.company?.name?.toLowerCase().includes(q);
+      if (!titleMatch && !companyMatch) match = false;
+    }
+
+    // Status Dropdown
+    if (statusFilter !== 'All Status') {
+       if (statusFilter === 'Offered' && app.status === 'Hired') {
+         // match
+       } else if (app.status !== statusFilter) {
+         match = false;
+       }
+    }
+
+    // Job Type Dropdown
+    if (jobTypeFilter !== 'All Job Type') {
+       const jobTypeFormatted = app.job?.jobType?.toLowerCase().replace('-', ' ') || '';
+       const filterFormatted = jobTypeFilter.toLowerCase();
+       if (jobTypeFormatted !== filterFormatted) {
+          match = false;
+       }
+    }
+
+    return match;
+  });
+
+  // Sorting
+  filteredApps.sort((a, b) => {
+    if (sortBy === 'latest') return new Date(b.createdAt) - new Date(a.createdAt);
+    if (sortBy === 'oldest') return new Date(a.createdAt) - new Date(b.createdAt);
+    return 0;
+  });
+
+  // Pagination
+  const totalItems = filteredApps.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const paginatedApps = filteredApps.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
 
   const filters = [
-    { label: 'All', count: 12 },
-    { label: 'Applied', count: 3 },
-    { label: 'In Review', count: 2 },
-    { label: 'Shortlisted', count: 2 },
-    { label: 'Interview', count: 1 },
-    { label: 'Offered', count: 1 },
-    { label: 'Rejected', count: 2 }
+    { label: 'All', count: stats.total },
+    { label: 'Applied', count: stats.applied },
+    { label: 'In Review', count: stats.inReview },
+    { label: 'Shortlisted', count: stats.shortlisted },
+    { label: 'Interview', count: stats.interview },
+    { label: 'Offered', count: stats.offered },
+    { label: 'Rejected', count: stats.rejected }
   ];
 
   return (
@@ -139,7 +193,7 @@ const MyApplications = () => {
           {filters.map((filter) => (
             <button
               key={filter.label}
-              onClick={() => setActiveFilter(filter.label)}
+              onClick={() => { setActiveFilter(filter.label); setCurrentPage(1); }}
               className={`px-4 py-2 rounded-xl text-sm font-bold border transition-colors ${
                 activeFilter === filter.label 
                 ? 'bg-brand-500 text-white border-brand-500 shadow-sm' 
@@ -158,92 +212,152 @@ const MyApplications = () => {
             <input 
               type="text" 
               placeholder="Search by job title, company..." 
+              value={searchQuery}
+              onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
               className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 font-medium text-gray-900"
             />
           </div>
           <div className="flex gap-3">
             <div className="relative">
-              <select className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 cursor-pointer">
+              <select 
+                value={statusFilter}
+                onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
+                className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 cursor-pointer"
+              >
                 <option>All Status</option>
+                <option>Applied</option>
                 <option>In Review</option>
                 <option>Shortlisted</option>
-                <option>Applied</option>
+                <option>Interview</option>
+                <option>Offered</option>
+                <option>Rejected</option>
               </select>
               <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
             </div>
             <div className="relative">
-              <select className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 cursor-pointer">
+              <select 
+                value={jobTypeFilter}
+                onChange={(e) => { setJobTypeFilter(e.target.value); setCurrentPage(1); }}
+                className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 cursor-pointer"
+              >
                 <option>All Job Type</option>
-                <option>Full Time</option>
-                <option>Part Time</option>
+                <option>Full time</option>
+                <option>Part time</option>
+                <option>Internship</option>
+                <option>Contract</option>
+                <option>Remote</option>
               </select>
               <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
             </div>
-            <button className="bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-              <SlidersHorizontal size={16} /> Sort by: Latest <ChevronDown size={14} />
-            </button>
+            <div className="relative">
+              <select
+                value={sortBy}
+                onChange={(e) => { setSortBy(e.target.value); setCurrentPage(1); }}
+                className="appearance-none bg-white border border-gray-200 rounded-xl px-4 py-2.5 pr-10 text-sm font-medium text-gray-700 hover:bg-gray-50 flex items-center gap-2 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500"
+              >
+                <option value="latest">Sort by: Latest</option>
+                <option value="oldest">Sort by: Oldest</option>
+              </select>
+              <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+            </div>
           </div>
         </div>
 
         {/* Applications List */}
         <div className="space-y-4">
-          {applications.map((app) => (
-            <div key={app.id} className="bg-white border border-gray-100 rounded-2xl p-5 hover:shadow-md hover:border-brand-200 transition-all">
-              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                
-                {/* Job Info */}
-                <div className="flex gap-4 items-center">
-                  <div className="w-14 h-14 bg-white border border-gray-100 rounded-xl p-2 flex items-center justify-center shrink-0 shadow-sm">
-                    <img src={app.logo} alt={app.company} className="max-w-full max-h-full object-contain" />
-                  </div>
-                  <div>
-                    <h3 className="font-black text-gray-900 text-lg mb-0.5">{app.title}</h3>
-                    <p className="text-sm text-gray-500 font-medium">{app.company}</p>
-                    
-                    <div className="flex flex-wrap items-center gap-4 mt-2 text-xs font-semibold text-gray-500">
-                      <span className="flex items-center gap-1"><MapPin size={12}/> {app.location}</span>
-                      <span className="flex items-center gap-1"><Briefcase size={12}/> {app.type}</span>
-                      <span className="flex items-center gap-1"><Clock size={12}/> {app.experience}</span>
-                      <span className="flex items-center gap-1"><IndianRupee size={12}/> {app.salary}</span>
+          {loading ? (
+             <div className="text-center py-10 text-gray-500 font-medium animate-pulse">Loading applications...</div>
+          ) : paginatedApps.length === 0 ? (
+             <div className="text-center py-10 bg-white border border-gray-100 rounded-2xl">
+                <p className="text-gray-500 font-medium">No applications found matching your criteria.</p>
+             </div>
+          ) : (
+            paginatedApps.map((app) => (
+              <div key={app._id} className="bg-white border border-gray-100 rounded-2xl p-5 hover:shadow-md hover:border-brand-200 transition-all">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  
+                  {/* Job Info */}
+                  <div className="flex gap-4 items-center flex-1">
+                    <div className="w-14 h-14 bg-white border border-gray-100 rounded-xl p-2 flex items-center justify-center shrink-0 shadow-sm overflow-hidden">
+                      {app.job?.company?.logo ? (
+                        <img src={app.job.company.logo} alt={app.job.company.name} className="max-w-full max-h-full object-contain" />
+                      ) : (
+                        <span className="text-xl font-bold text-gray-400">{app.job?.company?.name?.charAt(0) || 'C'}</span>
+                      )}
+                    </div>
+                    <div>
+                      <h3 className="font-black text-gray-900 text-lg mb-0.5">{app.job?.title || 'Unknown Job'}</h3>
+                      <p className="text-sm text-gray-500 font-medium">{app.job?.company?.name || 'Unknown Company'}</p>
+                      
+                      <div className="flex flex-wrap items-center gap-4 mt-2 text-xs font-semibold text-gray-500">
+                        <span className="flex items-center gap-1"><MapPin size={12}/> {app.job?.location || 'N/A'}</span>
+                        <span className="flex items-center gap-1"><Briefcase size={12}/> {app.job?.jobType || 'N/A'}</span>
+                        <span className="flex items-center gap-1"><Clock size={12}/> {app.job?.experienceLevel || app.job?.experience || 'N/A'}</span>
+                        <span className="flex items-center gap-1"><IndianRupee size={12}/> {formatSalary(app.job?.salary)}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Status and Action */}
-                <div className="flex flex-col md:items-end justify-between self-stretch">
-                  <div className="flex justify-between items-center w-full md:w-auto md:justify-end gap-2">
-                    <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border flex items-center gap-1.5 ${getStatusStyles(app.status)}`}>
-                      <span className="w-1.5 h-1.5 rounded-full bg-current"></span> {app.status}
-                    </span>
-                    <button className="text-gray-400 hover:text-gray-600"><span className="text-xl rotate-90 inline-block font-bold">...</span></button>
+                  {/* Status and Action */}
+                  <div className="flex flex-col md:items-end justify-between self-stretch shrink-0">
+                    <div className="flex justify-between items-center w-full md:w-auto md:justify-end gap-2">
+                      <span className={`text-[10px] font-bold px-2.5 py-1 rounded-full border flex items-center gap-1.5 ${getStatusStyles(app.status)}`}>
+                        <span className="w-1.5 h-1.5 rounded-full bg-current"></span> {app.status === 'Hired' ? 'Offered' : app.status}
+                      </span>
+                      <button className="text-gray-400 hover:text-gray-600"><span className="text-xl rotate-90 inline-block font-bold">...</span></button>
+                    </div>
+                    
+                    <div className="flex items-center justify-between w-full md:w-auto md:justify-end gap-6 mt-4 md:mt-0">
+                      <div className="text-xs text-gray-400 font-medium text-right">
+                        Applied on<br/><span className="text-gray-600">{formatDate(app.createdAt)}</span>
+                      </div>
+                      <Link to={`/jobs/${app.job?._id}`} className="text-brand-600 border border-brand-200 hover:bg-brand-50 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center gap-1">
+                        View Details <ChevronRight size={14} className="stroke-[3]" />
+                      </Link>
+                    </div>
                   </div>
                   
-                  <div className="flex items-center justify-between w-full md:w-auto md:justify-end gap-6 mt-4 md:mt-0">
-                    <div className="text-xs text-gray-400 font-medium">
-                      Applied on<br/><span className="text-gray-600">{app.appliedDate}</span>
-                    </div>
-                    <Link to={`/jobs/${app.id}`} className="text-brand-600 border border-brand-200 hover:bg-brand-50 font-bold py-2 px-4 rounded-lg text-sm transition-colors flex items-center gap-1">
-                      View Details <ChevronRight size={14} className="stroke-[3]" />
-                    </Link>
-                  </div>
                 </div>
-                
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
         
         {/* Pagination/Showing Entries */}
-        <div className="flex items-center justify-between pt-2">
-          <span className="text-sm text-gray-500 font-medium">Showing 1-5 of 12 applications</span>
-          <div className="flex gap-1">
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50">&larr;</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-brand-500 text-white font-bold">1</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 font-bold">2</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 font-bold">3</button>
-            <button className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50">&rarr;</button>
+        {!loading && totalItems > 0 && (
+          <div className="flex items-center justify-between pt-2">
+            <span className="text-sm text-gray-500 font-medium">
+              Showing {(currentPage - 1) * itemsPerPage + 1}-{Math.min(currentPage * itemsPerPage, totalItems)} of {totalItems} applications
+            </span>
+            <div className="flex gap-1">
+              <button 
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(p => p - 1)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 disabled:opacity-50"
+              >&larr;</button>
+              
+              {[...Array(totalPages)].map((_, i) => (
+                <button 
+                  key={i}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`w-8 h-8 flex items-center justify-center rounded-lg font-bold transition-colors ${
+                    currentPage === i + 1 
+                    ? 'bg-brand-500 text-white shadow-sm' 
+                    : 'border border-gray-200 text-gray-600 hover:bg-gray-50'
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+
+              <button 
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(p => p + 1)}
+                className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+              >&rarr;</button>
+            </div>
           </div>
-        </div>
+        )}
 
       </div>
 
@@ -254,26 +368,33 @@ const MyApplications = () => {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
           <h3 className="font-bold text-gray-900 mb-6">Application Stats</h3>
           
-          {/* Doughnut Chart Mock */}
+          {/* Dynamic Doughnut Chart */}
           <div className="flex justify-center mb-6">
             <div className="relative w-36 h-36">
-              {/* SVG Doughnut mimicking the design */}
               <svg viewBox="0 0 100 100" className="w-full h-full transform -rotate-90">
-                {/* Applied - Blue */}
-                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#3b82f6" strokeWidth="16" strokeDasharray="251.2" strokeDashoffset="188.4" />
-                {/* In Review - Orange */}
-                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#c2410c" strokeWidth="16" strokeDasharray="251.2" strokeDashoffset="213.5" className="transform rotate-[90deg] origin-center" />
-                {/* Shortlisted - Purple */}
-                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#8b5cf6" strokeWidth="16" strokeDasharray="251.2" strokeDashoffset="213.5" className="transform rotate-[144deg] origin-center" />
-                {/* Interview - Light Orange */}
-                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#fb923c" strokeWidth="16" strokeDasharray="251.2" strokeDashoffset="230" className="transform rotate-[198deg] origin-center" />
-                {/* Offered - Green */}
-                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#22c55e" strokeWidth="16" strokeDasharray="251.2" strokeDashoffset="230" className="transform rotate-[234deg] origin-center" />
-                {/* Rejected - Red */}
-                <circle cx="50" cy="50" r="40" fill="transparent" stroke="#ef4444" strokeWidth="16" strokeDasharray="251.2" strokeDashoffset="213.5" className="transform rotate-[270deg] origin-center" />
+                 {chartData.map((data, index) => {
+                    if(data.count === 0) return null;
+                    const rotation = calculateRotation(index, chartData);
+                    const dashOffset = calculateDashOffset(data.count, stats.total);
+                    return (
+                      <circle 
+                        key={data.label}
+                        cx="50" cy="50" r="40" 
+                        fill="transparent" 
+                        stroke={data.color} 
+                        strokeWidth="16" 
+                        strokeDasharray="251.2" 
+                        strokeDashoffset={dashOffset} 
+                        style={{ transform: `rotate(${rotation + 90}deg)`, transformOrigin: 'center' }} 
+                      />
+                    );
+                 })}
+                 {stats.total === 0 && (
+                    <circle cx="50" cy="50" r="40" fill="transparent" stroke="#f3f4f6" strokeWidth="16" />
+                 )}
               </svg>
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                <span className="text-2xl font-black text-gray-900 leading-none">12</span>
+                <span className="text-2xl font-black text-gray-900 leading-none">{stats.total}</span>
                 <span className="text-[9px] text-gray-400 font-bold uppercase tracking-wider mt-1 w-16">Total Applications</span>
               </div>
             </div>
@@ -281,10 +402,10 @@ const MyApplications = () => {
           
           {/* Stats List */}
           <div className="space-y-3">
-            {statsData.map((stat, i) => (
+            {chartData.map((stat, i) => (
               <div key={i} className="flex items-center justify-between text-sm">
                 <div className="flex items-center gap-2">
-                  <span className={`w-2.5 h-2.5 rounded-full ${stat.color}`}></span>
+                  <span className={`w-2.5 h-2.5 rounded-full ${stat.bgClass}`}></span>
                   <span className="text-gray-600 font-medium">{stat.label}</span>
                 </div>
                 <span className="font-bold text-gray-900">{stat.count}</span>
@@ -294,7 +415,7 @@ const MyApplications = () => {
           
           <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between text-sm">
             <span className="text-gray-400 font-medium">Total Applications</span>
-            <span className="font-bold text-gray-900">12</span>
+            <span className="font-bold text-gray-900">{stats.total}</span>
           </div>
         </div>
 

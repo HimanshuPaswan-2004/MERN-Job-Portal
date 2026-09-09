@@ -101,3 +101,43 @@ export const getDashboardData = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Get all applications for candidate
+// @route   GET /api/applications
+// @access  Private/Candidate
+export const getMyApplications = async (req, res, next) => {
+  try {
+    // Fetch all applications for the user
+    const applications = await Application.find({ applicant: req.user._id })
+      .populate({
+        path: 'job',
+        select: 'title company location jobType experience salary',
+        populate: {
+          path: 'company',
+          select: 'name logo'
+        }
+      })
+      .sort({ createdAt: -1 }); // Default sort by latest
+
+    // Calculate stats
+    let stats = {
+      total: applications.length,
+      applied: applications.filter(a => a.status === 'Applied').length,
+      inReview: applications.filter(a => a.status === 'In Review').length,
+      shortlisted: applications.filter(a => a.status === 'Shortlisted').length,
+      interview: applications.filter(a => a.status === 'Interview').length, // Assuming we have Interview status, or map it
+      offered: applications.filter(a => a.status === 'Hired' || a.status === 'Offered').length,
+      rejected: applications.filter(a => a.status === 'Rejected').length,
+    };
+
+    res.status(200).json({
+      success: true,
+      data: {
+        stats,
+        applications,
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
