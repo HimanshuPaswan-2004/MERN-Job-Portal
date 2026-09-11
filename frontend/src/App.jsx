@@ -79,10 +79,11 @@ const MainLayout = ({ children }) => (
 const AppContent = () => {
   const location = useLocation();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
+  const isRecruiterDashboard = location.pathname === '/recruiter/dashboard';
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {!isAuthPage && <Navbar />}
+      {!isAuthPage && !isRecruiterDashboard && <Navbar />}
       
       <main className="flex-grow">
         <Routes>
@@ -105,7 +106,7 @@ const AppContent = () => {
           
           {/* Recruiter Protected Routes */}
           <Route element={<ProtectedRoute allowedRoles={['recruiter']} />}>
-            <Route path="/recruiter/dashboard" element={<MainLayout><RecruiterDashboard /></MainLayout>} />
+            <Route path="/recruiter/dashboard" element={<RecruiterDashboard />} />
             <Route path="/recruiter/companies" element={<MainLayout><MyCompanies /></MainLayout>} />
             <Route path="/recruiter/companies/new" element={<MainLayout><CompanyForm /></MainLayout>} />
             <Route path="/recruiter/companies/:id/edit" element={<MainLayout><CompanyForm /></MainLayout>} />
