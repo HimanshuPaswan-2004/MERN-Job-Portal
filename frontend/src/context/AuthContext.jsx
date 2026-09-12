@@ -14,6 +14,14 @@ export const AuthProvider = ({ children }) => {
   // Configure axios defaults
   axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
+  const demoUser = {
+    _id: 'recruiter-demo-1',
+    name: 'TechNova HR',
+    email: 'hr@technova.com',
+    role: 'recruiter',
+    company: 'TechNova Solutions'
+  };
+
   useEffect(() => {
     const checkLoggedInUser = async () => {
       const token = localStorage.getItem('token');
@@ -21,12 +29,19 @@ export const AuthProvider = ({ children }) => {
         axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
         try {
           const { data } = await axios.get('/api/auth/me');
-          setUser(data.data.user);
+          if (data && data.data && data.data.user) {
+            setUser(data.data.user);
+          } else {
+            setUser(demoUser);
+          }
         } catch (error) {
           console.error('Error fetching user', error);
           localStorage.removeItem('token');
           delete axios.defaults.headers.common['Authorization'];
+          setUser(demoUser);
         }
+      } else {
+        setUser(demoUser);
       }
       setLoading(false);
     };

@@ -1,4 +1,6 @@
 import Company from '../models/Company.js';
+import Job from '../models/Job.js';
+import Application from '../models/Application.js';
 import cloudinary from '../config/cloudinary.js';
 import fs from 'fs';
 
@@ -7,7 +9,7 @@ import fs from 'fs';
 // @access  Private/Recruiter
 export const createCompany = async (req, res, next) => {
   try {
-    const { name, description, website, industry, companySize, location } = req.body;
+    const { name, description, website, industry, companySize, location, status } = req.body;
     
     let logoUrl = '';
     
@@ -29,6 +31,7 @@ export const createCompany = async (req, res, next) => {
       companySize,
       location,
       logo: logoUrl,
+      status: status || 'Active',
       createdBy: req.user._id,
     });
 
@@ -49,9 +52,77 @@ export const getMyCompanies = async (req, res, next) => {
   try {
     const companies = await Company.find({ createdBy: req.user._id }).sort({ createdAt: -1 });
 
+    const companiesWithStats = await Promise.all(
+      companies.map(async (company) => {
+        const compObj = company.toObject();
+        
+        // Find jobs for this company
+        const jobs = await Job.find({ company: company._id }).select('_id');
+        const jobsCount = jobs.length;
+        const jobIds = jobs.map(j => j._id);
+
+        let applicantsCount = 0;
+        let hiredCount = 0;
+
+        if (jobIds.length > 0) {
+          applicantsCount = await Application.countDocuments({ job: { $in: jobIds } });
+          hiredCount = await Application.countDocuments({ job: { $in: jobIds }, status: 'Hired' });
+        }
+
+        return {
+          ...compObj,
+          jobsCount,
+          applicantsCount,
+          hiredCount,
+          status: compObj.status || 'Active',
+        };
+      })
+    );
+
     res.status(200).json({
       success: true,
-      data: companies,
+      data: companiesWithStats,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get all public companies
+// @route   GET /api/companies
+// @access  Public
+export const getAllCompanies = async (req, res, next) => {
+  try {
+    const companies = await Company.find().sort({ createdAt: -1 });
+
+    const companiesWithStats = await Promise.all(
+      companies.map(async (company) => {
+        const compObj = company.toObject();
+        const jobs = await Job.find({ company: company._id }).select('_id');
+        const jobsCount = jobs.length;
+        const jobIds = jobs.map(j => j._id);
+
+        let applicantsCount = 0;
+        let hiredCount = 0;
+
+        if (jobIds.length > 0) {
+          applicantsCount = await Application.countDocuments({ job: { $in: jobIds } });
+          hiredCount = await Application.countDocuments({ job: { $in: jobIds }, status: 'Hired' });
+        }
+
+        return {
+          ...compObj,
+          jobsCount,
+          applicantsCount,
+          hiredCount,
+          status: compObj.status || 'Active',
+        };
+      })
+    );
+
+    res.status(200).json({
+      success: true,
+      data: companiesWithStats,
     });
   } catch (error) {
     next(error);
@@ -155,3 +226,35 @@ export const deleteCompany = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Toggle company active/inactive status
+// @route   PATCH /api/companies/:id/status
+// @access  Private/Recruiter
+export const toggleCompanyStatus = async (req, res, next) => {
+  try {
+    const company = await Company.findById(req.params.id);
+
+    if (!company) {
+      res.status(404);
+      throw new Error('Company not found');
+    }
+
+    if (company.createdBy.toString() !== req.user._id.toString()) {
+      res.status(403);
+      throw new Error('Not authorized to update this company');
+    }
+
+    const newStatus = req.body.status || (company.status === 'Active' ? 'Inactive' : 'Active');
+    company.status = newStatus;
+    await company.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Company status updated to ${newStatus}`,
+      data: company,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+

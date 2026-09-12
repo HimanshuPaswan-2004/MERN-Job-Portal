@@ -23,6 +23,11 @@ const companySchema = new mongoose.Schema({
   logo: {
     type: String,
   },
+  status: {
+    type: String,
+    enum: ['Active', 'Inactive'],
+    default: 'Active',
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

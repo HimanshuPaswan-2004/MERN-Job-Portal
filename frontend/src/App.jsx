@@ -17,6 +17,7 @@ import JobDetails from './pages/JobDetails';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import MyApplications from './pages/MyApplications';
+import RecruiterLayout from './components/RecruiterLayout';
 
 // Dummy components for now
 import { Home as HomeIcon, Search, FileText, User as UserIcon, FileCode, Bookmark, Bell, Settings, LogOut, Briefcase } from 'lucide-react';
@@ -79,17 +80,18 @@ const MainLayout = ({ children }) => (
 const AppContent = () => {
   const location = useLocation();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
-  const isRecruiterDashboard = location.pathname === '/recruiter/dashboard';
+  const isRecruiterPage = location.pathname.startsWith('/recruiter');
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      {!isAuthPage && !isRecruiterDashboard && <Navbar />}
+      {!isAuthPage && !isRecruiterPage && <Navbar />}
       
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/jobs/:id" element={<JobDetails />} />
+          <Route path="/companies" element={<RecruiterLayout><MyCompanies /></RecruiterLayout>} />
           
           {/* Auth routes without MainLayout (they are full screen themselves) */}
           <Route path="/signup" element={<Signup />} />
@@ -107,12 +109,12 @@ const AppContent = () => {
           {/* Recruiter Protected Routes */}
           <Route element={<ProtectedRoute allowedRoles={['recruiter']} />}>
             <Route path="/recruiter/dashboard" element={<RecruiterDashboard />} />
-            <Route path="/recruiter/companies" element={<MainLayout><MyCompanies /></MainLayout>} />
-            <Route path="/recruiter/companies/new" element={<MainLayout><CompanyForm /></MainLayout>} />
-            <Route path="/recruiter/companies/:id/edit" element={<MainLayout><CompanyForm /></MainLayout>} />
-            <Route path="/recruiter/jobs" element={<MainLayout><MyJobs /></MainLayout>} />
-            <Route path="/recruiter/jobs/new" element={<MainLayout><JobForm /></MainLayout>} />
-            <Route path="/recruiter/jobs/:id/edit" element={<MainLayout><JobForm /></MainLayout>} />
+            <Route path="/recruiter/companies" element={<RecruiterLayout><MyCompanies /></RecruiterLayout>} />
+            <Route path="/recruiter/companies/new" element={<RecruiterLayout><CompanyForm /></RecruiterLayout>} />
+            <Route path="/recruiter/companies/:id/edit" element={<RecruiterLayout><CompanyForm /></RecruiterLayout>} />
+            <Route path="/recruiter/jobs" element={<RecruiterLayout><MyJobs /></RecruiterLayout>} />
+            <Route path="/recruiter/jobs/new" element={<RecruiterLayout><JobForm /></RecruiterLayout>} />
+            <Route path="/recruiter/jobs/:id/edit" element={<RecruiterLayout><JobForm /></RecruiterLayout>} />
           </Route>
         </Routes>
       </main>
