@@ -9,27 +9,61 @@ import fs from 'fs';
 // @access  Private/Recruiter
 export const createCompany = async (req, res, next) => {
   try {
-    const { name, description, website, industry, companySize, location, status } = req.body;
+    const {
+      name,
+      description,
+      shortDescription,
+      fullDescription,
+      website,
+      industry,
+      companySize,
+      foundedYear,
+      companyType,
+      country,
+      city,
+      state,
+      address,
+      location,
+      status
+    } = req.body;
     
     let logoUrl = '';
     
     // Check if file is uploaded
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: 'jobportal_companies',
-      });
-      logoUrl = result.secure_url;
-      // Remove file from local storage after uploading
-      fs.unlinkSync(req.file.path);
+      if (process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUD_NAME) {
+        try {
+          const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'jobportal_companies',
+          });
+          logoUrl = result.secure_url;
+          if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        } catch (e) {
+          logoUrl = `/uploads/${req.file.filename}`;
+        }
+      } else {
+        logoUrl = `/uploads/${req.file.filename}`;
+      }
     }
+
+    const computedLocation = location || [city, state, country].filter(Boolean).join(', ') || 'India';
+    const computedDescription = description || fullDescription || shortDescription || '';
 
     const company = await Company.create({
       name,
-      description,
+      description: computedDescription,
+      shortDescription,
+      fullDescription,
       website,
       industry,
       companySize,
-      location,
+      foundedYear,
+      companyType,
+      country: country || 'India',
+      city,
+      state,
+      address,
+      location: computedLocation,
       logo: logoUrl,
       status: status || 'Active',
       createdBy: req.user._id,
@@ -172,15 +206,34 @@ export const updateCompany = async (req, res, next) => {
     
     // Check if new file is uploaded
     if (req.file) {
-      const result = await cloudinary.uploader.upload(req.file.path, {
-        folder: 'jobportal_companies',
-      });
-      logoUrl = result.secure_url;
-      fs.unlinkSync(req.file.path);
+      if (process.env.CLOUDINARY_CLOUD_NAME || process.env.CLOUD_NAME) {
+        try {
+          const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'jobportal_companies',
+          });
+          logoUrl = result.secure_url;
+          if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        } catch (e) {
+          logoUrl = `/uploads/${req.file.filename}`;
+        }
+      } else {
+        logoUrl = `/uploads/${req.file.filename}`;
+      }
     }
 
     const updatedData = { ...req.body };
     if (req.file) updatedData.logo = logoUrl;
+
+    if (updatedData.city || updatedData.country || updatedData.state) {
+      const city = updatedData.city || company.city;
+      const state = updatedData.state || company.state;
+      const country = updatedData.country || company.country;
+      updatedData.location = [city, state, country].filter(Boolean).join(', ') || company.location;
+    }
+
+    if (updatedData.fullDescription || updatedData.shortDescription) {
+      updatedData.description = updatedData.fullDescription || updatedData.shortDescription || company.description;
+    }
 
     company = await Company.findByIdAndUpdate(req.params.id, updatedData, {
       new: true,

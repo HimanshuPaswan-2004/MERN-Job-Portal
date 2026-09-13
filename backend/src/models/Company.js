@@ -8,6 +8,12 @@ const companySchema = new mongoose.Schema({
   description: {
     type: String,
   },
+  shortDescription: {
+    type: String,
+  },
+  fullDescription: {
+    type: String,
+  },
   website: {
     type: String,
   },
@@ -15,6 +21,25 @@ const companySchema = new mongoose.Schema({
     type: String,
   },
   companySize: {
+    type: String,
+  },
+  foundedYear: {
+    type: String,
+  },
+  companyType: {
+    type: String,
+  },
+  country: {
+    type: String,
+    default: 'India',
+  },
+  city: {
+    type: String,
+  },
+  state: {
+    type: String,
+  },
+  address: {
     type: String,
   },
   location: {
