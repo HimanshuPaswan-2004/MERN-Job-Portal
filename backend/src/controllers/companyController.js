@@ -24,6 +24,9 @@ export const createCompany = async (req, res, next) => {
       state,
       address,
       location,
+      linkedin,
+      twitter,
+      socialLinks,
       status
     } = req.body;
     
@@ -48,6 +51,8 @@ export const createCompany = async (req, res, next) => {
 
     const computedLocation = location || [city, state, country].filter(Boolean).join(', ') || 'India';
     const computedDescription = description || fullDescription || shortDescription || '';
+    const linkedinLink = linkedin || (socialLinks && socialLinks.linkedin) || '';
+    const twitterLink = twitter || (socialLinks && socialLinks.twitter) || '';
 
     const company = await Company.create({
       name,
@@ -65,6 +70,13 @@ export const createCompany = async (req, res, next) => {
       address,
       location: computedLocation,
       logo: logoUrl,
+      linkedin: linkedinLink,
+      twitter: twitterLink,
+      socialLinks: {
+        linkedin: linkedinLink,
+        twitter: twitterLink,
+        website: website || '',
+      },
       status: status || 'Active',
       createdBy: req.user._id,
     });
@@ -234,6 +246,16 @@ export const updateCompany = async (req, res, next) => {
     if (updatedData.fullDescription || updatedData.shortDescription) {
       updatedData.description = updatedData.fullDescription || updatedData.shortDescription || company.description;
     }
+
+    const linkedinLink = updatedData.linkedin !== undefined ? updatedData.linkedin : (company.linkedin || '');
+    const twitterLink = updatedData.twitter !== undefined ? updatedData.twitter : (company.twitter || '');
+    const websiteLink = updatedData.website !== undefined ? updatedData.website : (company.website || '');
+
+    updatedData.socialLinks = {
+      linkedin: linkedinLink,
+      twitter: twitterLink,
+      website: websiteLink,
+    };
 
     company = await Company.findByIdAndUpdate(req.params.id, updatedData, {
       new: true,

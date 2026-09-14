@@ -48,6 +48,19 @@ const companySchema = new mongoose.Schema({
   logo: {
     type: String,
   },
+  linkedin: {
+    type: String,
+    default: '',
+  },
+  twitter: {
+    type: String,
+    default: '',
+  },
+  socialLinks: {
+    linkedin: { type: String, default: '' },
+    twitter: { type: String, default: '' },
+    website: { type: String, default: '' },
+  },
   status: {
     type: String,
     enum: ['Active', 'Inactive'],

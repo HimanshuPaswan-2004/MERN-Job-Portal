@@ -17,45 +17,59 @@ import {
   List,
   ListOrdered,
   Link as LinkIcon,
-  Check,
   Loader2,
   X,
   Briefcase,
   Users,
   Building2,
-  Sparkles
+  Sparkles,
+  Pencil,
+  ChevronRight,
+  Trash2,
+  Home
 } from 'lucide-react';
 
 const CompanyForm = () => {
+  const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
+
   const [formData, setFormData] = useState({
-    name: '',
-    website: '',
-    industry: '',
-    companySize: '',
-    foundedYear: '',
-    companyType: '',
+    name: isEditMode ? 'TechNova Solutions' : '',
+    website: isEditMode ? 'https://www.technova.com' : '',
+    industry: isEditMode ? 'Information Technology' : '',
+    companySize: isEditMode ? '201 – 500 employees' : '',
+    foundedYear: isEditMode ? '2018' : '',
+    companyType: isEditMode ? 'Private Limited' : '',
     country: 'India',
-    city: '',
-    state: '',
-    address: '',
-    shortDescription: '',
-    fullDescription: '',
+    city: isEditMode ? 'Bangalore' : '',
+    state: isEditMode ? 'Karnataka' : '',
+    address: isEditMode ? '123 Innovation Drive, Koramangala, Bangalore - 560034' : '',
+    shortDescription: isEditMode
+      ? 'TechNova Solutions is a leading IT services and consulting company focused on building innovative software solutions for global clients.'
+      : '',
+    fullDescription: isEditMode
+      ? 'TechNova Solutions is a forward-thinking technology company that helps businesses accelerate their digital transformation. We specialize in web and mobile application development, cloud solutions, AI/ML, and enterprise software. Our mission is to build innovative solutions that create real impact and empower businesses worldwide.'
+      : '',
+    linkedin: isEditMode ? 'https://linkedin.com/company/technova' : '',
+    twitter: isEditMode ? 'https://twitter.com/technova' : '',
+    socialWebsite: isEditMode ? 'https://www.technova.com' : '',
     status: 'Active',
   });
 
   const [logo, setLogo] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(false);
   const [error, setError] = useState('');
   const [showPreviewModal, setShowPreviewModal] = useState(false);
-
-  const navigate = useNavigate();
-  const { id } = useParams();
-  const isEditMode = Boolean(id);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     if (isEditMode) {
       const fetchCompany = async () => {
+        setFetching(true);
         try {
           const token = localStorage.getItem('token');
           const headers = token ? { Authorization: `Bearer ${token}` } : {};
@@ -63,18 +77,27 @@ const CompanyForm = () => {
           if (data && data.data) {
             const comp = data.data;
             setFormData({
-              name: comp.name || '',
-              website: comp.website || '',
-              industry: comp.industry || '',
-              companySize: comp.companySize || '',
-              foundedYear: comp.foundedYear || '',
-              companyType: comp.companyType || '',
+              name: comp.name || 'TechNova Solutions',
+              website: comp.website || 'https://www.technova.com',
+              industry: comp.industry || 'Information Technology',
+              companySize: comp.companySize || '201 – 500 employees',
+              foundedYear: comp.foundedYear || '2018',
+              companyType: comp.companyType || 'Private Limited',
               country: comp.country || 'India',
-              city: comp.city || '',
-              state: comp.state || '',
-              address: comp.address || '',
-              shortDescription: comp.shortDescription || comp.description || '',
-              fullDescription: comp.fullDescription || comp.description || '',
+              city: comp.city || 'Bangalore',
+              state: comp.state || 'Karnataka',
+              address: comp.address || '123 Innovation Drive, Koramangala, Bangalore - 560034',
+              shortDescription:
+                comp.shortDescription ||
+                comp.description ||
+                'TechNova Solutions is a leading IT services and consulting company focused on building innovative software solutions for global clients.',
+              fullDescription:
+                comp.fullDescription ||
+                comp.description ||
+                'TechNova Solutions is a forward-thinking technology company that helps businesses accelerate their digital transformation. We specialize in web and mobile application development, cloud solutions, AI/ML, and enterprise software. Our mission is to build innovative solutions that create real impact and empower businesses worldwide.',
+              linkedin: comp.linkedin || comp.socialLinks?.linkedin || 'https://linkedin.com/company/technova',
+              twitter: comp.twitter || comp.socialLinks?.twitter || 'https://twitter.com/technova',
+              socialWebsite: comp.socialLinks?.website || comp.website || 'https://www.technova.com',
               status: comp.status || 'Active',
             });
             if (comp.logo) {
@@ -82,7 +105,9 @@ const CompanyForm = () => {
             }
           }
         } catch (err) {
-          setError('Error fetching company details');
+          console.error('Error fetching company details:', err);
+        } finally {
+          setFetching(false);
         }
       };
       fetchCompany();
@@ -92,7 +117,8 @@ const CompanyForm = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === 'shortDescription' && value.length > 200) return;
-    setFormData({ ...formData, [name]: value });
+    if (name === 'fullDescription' && value.length > 1000) return;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleFileChange = (e) => {
@@ -143,7 +169,10 @@ const CompanyForm = () => {
       formData.fullDescription.substring(0, start) +
       replacement +
       formData.fullDescription.substring(end);
-    setFormData({ ...formData, fullDescription: newText });
+    
+    if (newText.length <= 1000) {
+      setFormData((prev) => ({ ...prev, fullDescription: newText }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -154,10 +183,6 @@ const CompanyForm = () => {
     }
     if (!formData.industry) {
       setError('Please select an Industry.');
-      return;
-    }
-    if (!formData.companySize) {
-      setError('Please select a Company Size.');
       return;
     }
 
@@ -192,30 +217,56 @@ const CompanyForm = () => {
     }
   };
 
+  const handleDelete = async () => {
+    if (!id) return;
+    setDeleting(true);
+    try {
+      const token = localStorage.getItem('token');
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      await axios.delete(`/api/companies/${id}`, { headers });
+      navigate('/recruiter/companies');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete company');
+      setShowDeleteModal(false);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  if (fetching) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <Loader2 className="w-8 h-8 text-[#f9571c] animate-spin" />
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6">
-      {/* Breadcrumb Navigation */}
-      <nav className="flex items-center text-xs text-gray-500 font-medium space-x-2">
-        <Link to="/recruiter/companies" className="hover:text-[#f9571c] transition-colors flex items-center gap-1">
-          <Building2 className="w-3.5 h-3.5" />
+    <div className="space-y-5 pb-12">
+      {/* Top Breadcrumb Navigation */}
+      <nav className="flex items-center text-xs font-medium text-gray-500 space-x-2">
+        <Link to="/recruiter/companies" className="hover:text-[#f9571c] transition-colors flex items-center gap-1 text-gray-500">
+          <Home className="w-3.5 h-3.5" />
           <span>My Companies</span>
         </Link>
+        <span>&gt;</span>
+        <span className="text-gray-600">{formData.name || 'TechNova Solutions'}</span>
         <span>&gt;</span>
         <span className="text-gray-900 font-semibold">{isEditMode ? 'Edit Company' : 'Create Company'}</span>
       </nav>
 
-      {/* Main Header */}
+      {/* Title Section */}
       <div>
-        <h1 className="text-3xl font-black text-gray-900 tracking-tight">
-          {isEditMode ? 'Edit Company Details' : 'Create a New Company'}
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+          {isEditMode ? 'Edit Company' : 'Create Company'}
         </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          Add your company details to start posting jobs and attract top talent.
+        <p className="text-xs sm:text-sm text-gray-500 mt-1 font-medium">
+          Update your company details. Keep your information up to date for better visibility.
         </p>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-xs font-semibold flex items-center justify-between shadow-2xs">
           <span>{error}</span>
           <button onClick={() => setError('')} className="text-red-500 hover:text-red-800">
             <X className="w-4 h-4" />
@@ -223,68 +274,77 @@ const CompanyForm = () => {
         </div>
       )}
 
-      {/* 2 Column Layout: Left Form (8 cols), Right Sidebar Widgets (4 cols) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      {/* Main 12-Column Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        {/* Left Column Form */}
+        {/* Left Column Form (8 Cols) */}
         <div className="lg:col-span-8 space-y-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             
             {/* Card 1: Basic Information */}
-            <div className="bg-white p-6 sm:p-7 rounded-2xl border border-gray-200/80 shadow-xs space-y-6">
+            <div className="bg-white p-6 sm:p-7 rounded-2xl border border-gray-200/80 shadow-2xs space-y-6">
               <div className="flex items-start gap-3 border-b border-gray-100 pb-4">
                 <div className="w-9 h-9 rounded-xl bg-orange-50 text-[#f9571c] flex items-center justify-center shrink-0">
                   <Building className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900 leading-tight">Basic Information</h2>
-                  <p className="text-xs text-gray-500">Provide the basic details about your company.</p>
+                  <h2 className="text-base sm:text-lg font-bold text-gray-900 leading-tight">Basic Information</h2>
+                  <p className="text-xs text-gray-500">Update the basic details about your company.</p>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-                {/* Logo Dropzone (Left col inside Basic Info) */}
-                <div className="md:col-span-4">
-                  <label className="block text-xs font-bold text-gray-700 mb-2">Company Logo</label>
-                  <div className="relative border-2 border-dashed border-gray-200 hover:border-[#f9571c]/50 rounded-2xl p-4 text-center bg-gray-50/60 hover:bg-orange-50/20 transition-all flex flex-col items-center justify-center min-h-[160px] cursor-pointer group">
+                
+                {/* Company Logo Dropzone / Container (Left side of Basic Info) */}
+                <div className="md:col-span-4 flex flex-col items-center sm:items-start space-y-3">
+                  <label className="block text-xs font-bold text-gray-700">Company Logo</label>
+                  
+                  {/* Square Logo Box with Edit Badge */}
+                  <div className="relative group w-36 h-36 bg-[#1a1514] rounded-2xl flex items-center justify-center p-3 border border-gray-800 shadow-md">
+                    {logoPreview ? (
+                      <img
+                        src={logoPreview}
+                        alt="Company Logo"
+                        className="w-full h-full object-contain rounded-xl"
+                      />
+                    ) : (
+                      <div className="w-full h-full rounded-xl bg-[#241d1b] flex items-center justify-center text-amber-500 font-extrabold text-5xl tracking-wider select-none">
+                        {formData.name ? formData.name.charAt(0).toUpperCase() : 'T'}
+                      </div>
+                    )}
+
+                    {/* Pencil Edit Icon Badge on bottom right corner */}
+                    <label
+                      htmlFor="company-logo-input"
+                      className="absolute -bottom-2 -right-2 w-9 h-9 bg-[#f9571c] hover:bg-[#e04810] text-white rounded-full flex items-center justify-center shadow-lg border-2 border-white cursor-pointer transition-transform hover:scale-105"
+                      title="Edit Logo"
+                    >
+                      <Pencil className="w-4 h-4 stroke-[2.5]" />
+                    </label>
+
                     <input
+                      id="company-logo-input"
                       type="file"
                       accept="image/png, image/jpeg, image/jpg"
                       onChange={handleFileChange}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      className="hidden"
                     />
+                  </div>
 
-                    {logoPreview ? (
-                      <div className="relative w-full flex flex-col items-center">
-                        <img
-                          src={logoPreview}
-                          alt="Logo Preview"
-                          className="w-20 h-20 object-contain rounded-xl border border-gray-200 bg-white p-1 mb-2 shadow-xs"
-                        />
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            removeLogo();
-                          }}
-                          className="text-[11px] font-bold text-red-600 hover:underline z-20 flex items-center gap-1 mt-1"
-                        >
-                          <X className="w-3 h-3" /> Remove Logo
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="w-12 h-12 rounded-full bg-white border border-gray-200 shadow-2xs flex items-center justify-center text-gray-400 group-hover:text-[#f9571c] group-hover:border-orange-200 mb-2 transition-colors">
-                          <Upload className="w-5 h-5 stroke-[2]" />
-                        </div>
-                        <p className="text-xs font-bold text-gray-800">Click to upload logo</p>
-                        <p className="text-[11px] text-gray-400 mt-0.5">PNG, JPG (Max 2MB)</p>
-                      </>
-                    )}
+                  {/* Change Logo Button & Specs */}
+                  <div className="flex flex-col items-center sm:items-start pt-1 space-y-1">
+                    <label
+                      htmlFor="company-logo-input"
+                      className="px-4 py-2 bg-white border border-gray-200 text-gray-700 hover:text-[#f9571c] hover:border-orange-200 rounded-xl text-xs font-bold transition-colors shadow-2xs flex items-center gap-2 cursor-pointer"
+                    >
+                      <Upload className="w-3.5 h-3.5 text-gray-500" />
+                      <span>Change Logo</span>
+                    </label>
+                    <span className="text-[11px] text-gray-400 font-medium">PNG, JPG (Max 2MB)</span>
                   </div>
                 </div>
 
-                {/* Form Fields (Right cols inside Basic Info) */}
+                {/* Form Fields (Right side of Basic Info) */}
                 <div className="md:col-span-8 space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
@@ -295,24 +355,24 @@ const CompanyForm = () => {
                         type="text"
                         name="name"
                         required
-                        placeholder="Enter company name"
+                        placeholder="TechNova Solutions"
                         value={formData.name}
                         onChange={handleChange}
-                        className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400"
+                        className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400 font-medium text-gray-900"
                       />
                     </div>
 
                     <div>
                       <label className="block text-xs font-bold text-gray-700 mb-1.5">Website</label>
                       <div className="relative">
-                        <Globe className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                        <LinkIcon className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                         <input
                           type="url"
                           name="website"
-                          placeholder="https://www.yourcompany.com"
+                          placeholder="https://www.technova.com"
                           value={formData.website}
                           onChange={handleChange}
-                          className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400"
+                          className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400 text-gray-900"
                         />
                       </div>
                     </div>
@@ -328,7 +388,7 @@ const CompanyForm = () => {
                         required
                         value={formData.industry}
                         onChange={handleChange}
-                        className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all text-gray-700"
+                        className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all text-gray-900 font-medium"
                       >
                         <option value="">Select industry</option>
                         <option value="Information Technology">Information Technology</option>
@@ -354,14 +414,14 @@ const CompanyForm = () => {
                         required
                         value={formData.companySize}
                         onChange={handleChange}
-                        className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all text-gray-700"
+                        className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all text-gray-900 font-medium"
                       >
                         <option value="">Select company size</option>
-                        <option value="1 - 10 employees">1 - 10 employees</option>
-                        <option value="11 - 50 employees">11 - 50 employees</option>
-                        <option value="51 - 200 employees">51 - 200 employees</option>
-                        <option value="201 - 500 employees">201 - 500 employees</option>
-                        <option value="501 - 1,000 employees">501 - 1,000 employees</option>
+                        <option value="1 – 10 employees">1 – 10 employees</option>
+                        <option value="11 – 50 employees">11 – 50 employees</option>
+                        <option value="51 – 200 employees">51 – 200 employees</option>
+                        <option value="201 – 500 employees">201 – 500 employees</option>
+                        <option value="501 – 1,000 employees">501 – 1,000 employees</option>
                         <option value="1,000+ employees">1,000+ employees</option>
                       </select>
                     </div>
@@ -375,10 +435,10 @@ const CompanyForm = () => {
                         <input
                           type="text"
                           name="foundedYear"
-                          placeholder="e.g. 2020"
+                          placeholder="2018"
                           value={formData.foundedYear}
                           onChange={handleChange}
-                          className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400"
+                          className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400 text-gray-900 font-medium"
                         />
                       </div>
                     </div>
@@ -389,11 +449,11 @@ const CompanyForm = () => {
                         name="companyType"
                         value={formData.companyType}
                         onChange={handleChange}
-                        className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all text-gray-700"
+                        className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all text-gray-900 font-medium"
                       >
                         <option value="">Select company type</option>
-                        <option value="Private">Private</option>
-                        <option value="Public">Public</option>
+                        <option value="Private Limited">Private Limited</option>
+                        <option value="Public Limited">Public Limited</option>
                         <option value="Startup">Startup</option>
                         <option value="Enterprise">Enterprise</option>
                         <option value="Non-Profit">Non-Profit</option>
@@ -401,19 +461,20 @@ const CompanyForm = () => {
                       </select>
                     </div>
                   </div>
+
                 </div>
               </div>
             </div>
 
             {/* Card 2: Location */}
-            <div className="bg-white p-6 sm:p-7 rounded-2xl border border-gray-200/80 shadow-xs space-y-5">
+            <div className="bg-white p-6 sm:p-7 rounded-2xl border border-gray-200/80 shadow-2xs space-y-5">
               <div className="flex items-start gap-3 border-b border-gray-100 pb-4">
                 <div className="w-9 h-9 rounded-xl bg-orange-50 text-[#f9571c] flex items-center justify-center shrink-0">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900 leading-tight">Location</h2>
-                  <p className="text-xs text-gray-500">Add your company's location details.</p>
+                  <h2 className="text-base sm:text-lg font-bold text-gray-900 leading-tight">Location</h2>
+                  <p className="text-xs text-gray-500">Update your company's location details.</p>
                 </div>
               </div>
 
@@ -427,7 +488,7 @@ const CompanyForm = () => {
                     required
                     value={formData.country}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all text-gray-700"
+                    className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all text-gray-900 font-medium"
                   >
                     <option value="India">India</option>
                     <option value="United States">United States</option>
@@ -448,10 +509,10 @@ const CompanyForm = () => {
                     type="text"
                     name="city"
                     required
-                    placeholder="Enter city"
+                    placeholder="Bangalore"
                     value={formData.city}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400"
+                    className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400 text-gray-900 font-medium"
                   />
                 </div>
 
@@ -460,10 +521,10 @@ const CompanyForm = () => {
                   <input
                     type="text"
                     name="state"
-                    placeholder="Enter state"
+                    placeholder="Karnataka"
                     value={formData.state}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400"
+                    className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400 text-gray-900 font-medium"
                   />
                 </div>
               </div>
@@ -475,24 +536,24 @@ const CompanyForm = () => {
                   <input
                     type="text"
                     name="address"
-                    placeholder="Enter complete address"
+                    placeholder="123 Innovation Drive, Koramangala, Bangalore - 560034"
                     value={formData.address}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400"
+                    className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400 text-gray-900 font-medium"
                   />
                 </div>
               </div>
             </div>
 
             {/* Card 3: About Company */}
-            <div className="bg-white p-6 sm:p-7 rounded-2xl border border-gray-200/80 shadow-xs space-y-5">
+            <div className="bg-white p-6 sm:p-7 rounded-2xl border border-gray-200/80 shadow-2xs space-y-5">
               <div className="flex items-start gap-3 border-b border-gray-100 pb-4">
                 <div className="w-9 h-9 rounded-xl bg-orange-50 text-[#f9571c] flex items-center justify-center shrink-0">
                   <FileText className="w-5 h-5" />
                 </div>
                 <div>
-                  <h2 className="text-lg font-bold text-gray-900 leading-tight">About Company</h2>
-                  <p className="text-xs text-gray-500">Tell candidates more about your company.</p>
+                  <h2 className="text-base sm:text-lg font-bold text-gray-900 leading-tight">About Company</h2>
+                  <p className="text-xs text-gray-500">Update your company description.</p>
                 </div>
               </div>
 
@@ -505,12 +566,12 @@ const CompanyForm = () => {
                     name="shortDescription"
                     rows="3"
                     required
-                    placeholder="A short description about your company..."
+                    placeholder="TechNova Solutions is a leading IT services and consulting company..."
                     value={formData.shortDescription}
                     onChange={handleChange}
-                    className="w-full px-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400"
+                    className="w-full px-3.5 py-2.5 pb-7 bg-white border border-gray-200 rounded-xl text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400 text-gray-800 leading-relaxed font-medium"
                   ></textarea>
-                  <span className="absolute bottom-2.5 right-3 text-[11px] font-semibold text-gray-400">
+                  <span className="absolute bottom-2.5 right-3 text-[11px] font-medium text-gray-400 select-none">
                     {formData.shortDescription.length}/200
                   </span>
                 </div>
@@ -521,14 +582,14 @@ const CompanyForm = () => {
                   Full Description <span className="text-[#f9571c]">*</span>
                 </label>
                 
-                {/* Rich Formatting Toolbar */}
+                {/* Formatting Toolbar + Textarea */}
                 <div className="border border-gray-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-[#f9571c]/20 focus-within:border-[#f9571c] transition-all">
-                  <div className="bg-gray-50/80 border-b border-gray-200 px-3 py-1.5 flex items-center gap-1">
+                  <div className="bg-gray-50/90 border-b border-gray-200 px-3 py-1.5 flex items-center gap-1">
                     <button
                       type="button"
                       onClick={() => handleFormatText('bold')}
                       title="Bold"
-                      className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200/70 rounded-md transition-colors"
+                      className="p-1.5 text-gray-700 hover:text-gray-900 hover:bg-gray-200/80 rounded-md transition-colors font-bold text-xs"
                     >
                       <Bold className="w-4 h-4" />
                     </button>
@@ -536,7 +597,7 @@ const CompanyForm = () => {
                       type="button"
                       onClick={() => handleFormatText('italic')}
                       title="Italic"
-                      className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200/70 rounded-md transition-colors"
+                      className="p-1.5 text-gray-700 hover:text-gray-900 hover:bg-gray-200/80 rounded-md transition-colors"
                     >
                       <Italic className="w-4 h-4" />
                     </button>
@@ -544,7 +605,7 @@ const CompanyForm = () => {
                       type="button"
                       onClick={() => handleFormatText('underline')}
                       title="Underline"
-                      className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200/70 rounded-md transition-colors"
+                      className="p-1.5 text-gray-700 hover:text-gray-900 hover:bg-gray-200/80 rounded-md transition-colors"
                     >
                       <Underline className="w-4 h-4" />
                     </button>
@@ -553,7 +614,7 @@ const CompanyForm = () => {
                       type="button"
                       onClick={() => handleFormatText('bullet')}
                       title="Bullet List"
-                      className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200/70 rounded-md transition-colors"
+                      className="p-1.5 text-gray-700 hover:text-gray-900 hover:bg-gray-200/80 rounded-md transition-colors"
                     >
                       <List className="w-4 h-4" />
                     </button>
@@ -561,7 +622,7 @@ const CompanyForm = () => {
                       type="button"
                       onClick={() => handleFormatText('number')}
                       title="Numbered List"
-                      className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200/70 rounded-md transition-colors"
+                      className="p-1.5 text-gray-700 hover:text-gray-900 hover:bg-gray-200/80 rounded-md transition-colors"
                     >
                       <ListOrdered className="w-4 h-4" />
                     </button>
@@ -570,32 +631,95 @@ const CompanyForm = () => {
                       type="button"
                       onClick={() => handleFormatText('link')}
                       title="Insert Link"
-                      className="p-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-200/70 rounded-md transition-colors"
+                      className="p-1.5 text-gray-700 hover:text-gray-900 hover:bg-gray-200/80 rounded-md transition-colors"
                     >
                       <LinkIcon className="w-4 h-4" />
                     </button>
                   </div>
 
-                  <textarea
-                    id="fullDescriptionTextarea"
-                    name="fullDescription"
-                    rows="6"
-                    required
-                    placeholder="Write a detailed description about your company, mission, culture, products, etc..."
-                    value={formData.fullDescription}
-                    onChange={handleChange}
-                    className="w-full p-3.5 bg-white border-0 text-sm focus:outline-hidden placeholder:text-gray-400"
-                  ></textarea>
+                  <div className="relative">
+                    <textarea
+                      id="fullDescriptionTextarea"
+                      name="fullDescription"
+                      rows="6"
+                      required
+                      placeholder="TechNova Solutions is a forward-thinking technology company that helps businesses accelerate their digital transformation..."
+                      value={formData.fullDescription}
+                      onChange={handleChange}
+                      className="w-full p-3.5 pb-7 bg-white border-0 text-sm focus:outline-hidden text-gray-800 leading-relaxed font-medium placeholder:text-gray-400 resize-y"
+                    ></textarea>
+                    <span className="absolute bottom-2.5 right-3 text-[11px] font-medium text-gray-400 select-none">
+                      {formData.fullDescription.length}/1000
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
 
-            {/* Bottom Form Actions */}
+            {/* Card 4: Social Links */}
+            <div className="bg-white p-6 sm:p-7 rounded-2xl border border-gray-200/80 shadow-2xs space-y-5">
+              <div className="flex items-start gap-3 border-b border-gray-100 pb-4">
+                <div className="w-9 h-9 rounded-xl bg-orange-50 text-[#f9571c] flex items-center justify-center shrink-0">
+                  <LinkIcon className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="text-base sm:text-lg font-bold text-gray-900 leading-tight">Social Links</h2>
+                  <p className="text-xs text-gray-500">Update your social media links.</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* LinkedIn Link */}
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded bg-sky-100 text-sky-700 flex items-center justify-center font-bold text-[10px]">
+                    in
+                  </div>
+                  <input
+                    type="url"
+                    name="linkedin"
+                    placeholder="https://linkedin.com/company/technova"
+                    value={formData.linkedin}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400 text-gray-900 font-medium"
+                  />
+                </div>
+
+                {/* Twitter Link */}
+                <div className="relative">
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded bg-gray-100 text-gray-800 flex items-center justify-center font-bold text-xs">
+                    X
+                  </div>
+                  <input
+                    type="url"
+                    name="twitter"
+                    placeholder="https://twitter.com/technova"
+                    value={formData.twitter}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400 text-gray-900 font-medium"
+                  />
+                </div>
+
+                {/* Social Website Link */}
+                <div className="relative">
+                  <Globe className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="url"
+                    name="socialWebsite"
+                    placeholder="https://www.technova.com"
+                    value={formData.socialWebsite}
+                    onChange={handleChange}
+                    className="w-full pl-10 pr-3.5 py-2.5 bg-white border border-gray-200 rounded-xl text-xs sm:text-sm focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400 text-gray-900 font-medium"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Form Bottom Action Buttons */}
             <div className="flex items-center justify-start gap-4 pt-2">
               <button
                 type="button"
                 onClick={() => navigate('/recruiter/companies')}
-                className="px-6 py-2.5 bg-white border border-[#f9571c] text-[#f9571c] font-bold text-sm rounded-xl hover:bg-orange-50 transition-colors cursor-pointer"
+                className="px-7 py-2.5 bg-white border border-[#f9571c] text-[#f9571c] font-bold text-sm rounded-xl hover:bg-orange-50 transition-colors cursor-pointer"
               >
                 Cancel
               </button>
@@ -603,7 +727,7 @@ const CompanyForm = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-7 py-2.5 bg-[#f9571c] hover:bg-[#e04810] text-white font-bold text-sm rounded-xl shadow-xs transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
+                className="px-8 py-2.5 bg-[#f9571c] hover:bg-[#e04810] text-white font-bold text-sm rounded-xl shadow-xs transition-all flex items-center gap-2 disabled:opacity-50 cursor-pointer"
               >
                 {loading ? (
                   <>
@@ -611,100 +735,196 @@ const CompanyForm = () => {
                     <span>Saving...</span>
                   </>
                 ) : (
-                  <span>{isEditMode ? 'Update Company' : 'Create Company'}</span>
+                  <span>Save Changes</span>
                 )}
               </button>
             </div>
+
           </form>
         </div>
 
-        {/* Right Sidebar Widgets (4 cols) */}
+        {/* Right Column Sidebar Widgets (4 Cols) */}
         <div className="lg:col-span-4 space-y-6">
 
-          {/* Widget 1: Graphic Card */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs text-center relative overflow-hidden">
-            <div className="w-24 h-24 mx-auto mb-4 flex items-center justify-center bg-gradient-to-br from-orange-100 to-amber-50 rounded-2xl border border-orange-100">
-              <div className="relative">
-                <div className="flex items-end gap-1">
-                  <div className="w-5 h-12 bg-gray-800 rounded-t-xs"></div>
-                  <div className="w-7 h-16 bg-[#f9571c] rounded-t-xs flex items-center justify-center text-white">
-                    <Building2 className="w-4 h-4" />
-                  </div>
-                  <div className="w-5 h-10 bg-gray-700 rounded-t-xs"></div>
+          {/* Widget 1: Company Preview Card */}
+          <div className="bg-white rounded-2xl border border-gray-200/80 shadow-2xs overflow-hidden">
+            {/* Header Title */}
+            <div className="p-4 border-b border-gray-100 flex items-center justify-between">
+              <h3 className="font-bold text-gray-900 text-sm">Company Preview</h3>
+              <button
+                type="button"
+                onClick={() => setShowPreviewModal(true)}
+                className="text-gray-400 hover:text-gray-700 transition-colors"
+                title="Open Preview Modal"
+              >
+                <ExternalLink className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modern Banner Header Image */}
+            <div className="h-32 bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 relative overflow-hidden flex items-center justify-end pr-4">
+              <div className="absolute inset-0 bg-black/20"></div>
+              {/* Graphic background line art */}
+              <div className="absolute -left-10 -bottom-10 w-48 h-48 rounded-full bg-white/5 blur-xl"></div>
+              <div className="absolute top-2 left-6 w-32 h-20 bg-blue-500/10 rounded-full blur-md"></div>
+              
+              {/* Overlay graphic text badge */}
+              <div className="relative z-10 text-right transform rotate-[-3deg]">
+                <div className="inline-block bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/20 text-white shadow-lg">
+                  <span className="font-serif italic text-sm tracking-wide text-amber-300 font-bold block">
+                    Innovate
+                  </span>
+                  <span className="font-extrabold text-xs tracking-wider uppercase text-white block">
+                    Build Grow Together
+                  </span>
                 </div>
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-5 h-5 bg-amber-400 rounded-full border-2 border-white shadow-xs"></div>
               </div>
             </div>
 
-            <h3 className="font-extrabold text-gray-900 text-lg mb-1.5">Create Your Company</h3>
-            <p className="text-xs text-gray-500 leading-relaxed px-1">
-              A detailed company profile helps you attract the right talent and build a strong employer brand.
+            {/* Card Content Body */}
+            <div className="p-5 pt-0 relative space-y-4">
+              
+              {/* Overlapping Company Logo */}
+              <div className="relative -mt-10 mb-2">
+                <div className="w-16 h-16 bg-[#1a1514] rounded-2xl border-4 border-white shadow-md flex items-center justify-center p-1 overflow-hidden">
+                  {logoPreview ? (
+                    <img src={logoPreview} alt="Logo" className="w-full h-full object-contain" />
+                  ) : (
+                    <span className="text-amber-500 font-extrabold text-2xl">
+                      {formData.name ? formData.name.charAt(0).toUpperCase() : 'T'}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Company Title & Subtitle */}
+              <div>
+                <h4 className="text-lg font-extrabold text-gray-900 leading-snug">
+                  {formData.name || 'TechNova Solutions'}
+                </h4>
+                <p className="text-xs font-semibold text-gray-500 mt-0.5">
+                  {formData.industry ? `${formData.industry} & Consulting` : 'IT Services & Consulting'}
+                </p>
+              </div>
+
+              {/* Metadata Details List */}
+              <div className="space-y-2 text-xs text-gray-600 font-medium border-t border-gray-100 pt-3">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                  <span>
+                    {[formData.city, formData.country].filter(Boolean).join(', ') || 'Bangalore, India'}
+                  </span>
+                </div>
+
+                {formData.companySize && (
+                  <div className="flex items-center gap-2">
+                    <Users className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                    <span>{formData.companySize}</span>
+                  </div>
+                )}
+
+                {formData.industry && (
+                  <div className="flex items-center gap-2">
+                    <Building2 className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                    <span>{formData.industry}</span>
+                  </div>
+                )}
+
+                {(formData.website || formData.socialWebsite) && (
+                  <div className="flex items-center gap-2">
+                    <Globe className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                    <a
+                      href={formData.website || formData.socialWebsite}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-gray-600 hover:text-[#f9571c] truncate"
+                    >
+                      {formData.website || formData.socialWebsite}
+                    </a>
+                  </div>
+                )}
+              </div>
+
+              {/* Short Bio Description */}
+              <p className="text-xs text-gray-500 leading-relaxed pt-1 border-t border-gray-100">
+                {formData.shortDescription ||
+                  'TechNova Solutions is a leading IT services and consulting company focused on building innovative software solutions for global clients.'}
+              </p>
+
+              {/* View Public Profile Button */}
+              <button
+                type="button"
+                onClick={() => setShowPreviewModal(true)}
+                className="w-full mt-2 bg-white hover:bg-orange-50 text-[#f9571c] font-bold py-2.5 px-4 rounded-xl border border-[#f9571c] text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <span>View Public Profile</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Widget 2: Pro Tip Card */}
+          <div className="bg-[#fffcf6] rounded-2xl p-5 border border-amber-200/80 shadow-2xs space-y-2">
+            <div className="flex items-center gap-2 text-[#f9571c]">
+              <div className="p-1.5 bg-amber-100 text-amber-600 rounded-lg">
+                <Lightbulb className="w-4 h-4 fill-amber-500 text-amber-500" />
+              </div>
+              <h4 className="font-extrabold text-gray-900 text-xs sm:text-sm">Pro Tip</h4>
+            </div>
+            <p className="text-xs text-gray-600 leading-relaxed font-medium">
+              A complete and up-to-date company profile attracts better candidates and builds trust.
             </p>
           </div>
 
-          {/* Widget 2: Tips for a Great Company Profile */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="p-1 bg-amber-50 rounded-lg text-amber-500">
-                <Lightbulb className="w-5 h-5 fill-amber-400 text-amber-500" />
-              </div>
-              <h3 className="font-extrabold text-gray-900 text-sm text-[#f9571c]">Tips for a Great Company Profile</h3>
-            </div>
+          {/* Widget 3: Quick Actions Card */}
+          <div className="bg-white rounded-2xl p-5 border border-gray-200/80 shadow-2xs space-y-3">
+            <h4 className="font-bold text-gray-900 text-sm mb-2">Quick Actions</h4>
 
-            <div className="space-y-3">
-              {[
-                'Use a clear and professional company name.',
-                'Upload a high-quality company logo.',
-                'Write a compelling company description.',
-                'Add your website and social links.',
-                'Mention company size and industry.',
-                'Keep the information up to date.'
-              ].map((tip, idx) => (
-                <div key={idx} className="flex items-start gap-3">
-                  <div className="w-5 h-5 rounded-full bg-[#f9571c] text-white font-bold text-[11px] flex items-center justify-center shrink-0 mt-0.5">
-                    {idx + 1}
+            <div className="space-y-2">
+              {/* View Company */}
+              <button
+                type="button"
+                onClick={() => setShowPreviewModal(true)}
+                className="w-full flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-orange-50/60 border border-gray-100 hover:border-orange-200 transition-colors text-xs font-bold text-gray-800 group cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-lg bg-orange-100 text-[#f9571c] flex items-center justify-center">
+                    <Eye className="w-3.5 h-3.5" />
                   </div>
-                  <p className="text-xs font-medium text-gray-600 leading-snug">{tip}</p>
+                  <span>View Company</span>
                 </div>
-              ))}
-            </div>
-          </div>
+                <ChevronRight className="w-4 h-4 text-[#f9571c] group-hover:translate-x-0.5 transition-transform" />
+              </button>
 
-          {/* Widget 3: Live Preview on Job Portal */}
-          <div className="bg-white rounded-2xl p-6 border border-gray-200/80 shadow-xs space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="p-2 bg-orange-50 text-[#f9571c] rounded-xl">
-                <Eye className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-bold text-gray-900 text-sm">Preview on Job Portal</h3>
-                <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
-                  Your company profile will be visible to job seekers on the platform.
-                </p>
-              </div>
-            </div>
+              {/* Manage Jobs */}
+              <button
+                type="button"
+                onClick={() => navigate('/recruiter/jobs')}
+                className="w-full flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-orange-50/60 border border-gray-100 hover:border-orange-200 transition-colors text-xs font-bold text-gray-800 group cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-lg bg-orange-100 text-[#f9571c] flex items-center justify-center">
+                    <Briefcase className="w-3.5 h-3.5" />
+                  </div>
+                  <span>Manage Jobs</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-[#f9571c] group-hover:translate-x-0.5 transition-transform" />
+              </button>
 
-            <button
-              type="button"
-              onClick={() => setShowPreviewModal(true)}
-              className="w-full bg-white hover:bg-orange-50 text-[#f9571c] font-bold py-2.5 px-4 rounded-xl border border-[#f9571c] text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <span>View Preview</span>
-              <ExternalLink className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Widget 4: Stylized Quote Card */}
-          <div className="bg-[#fef3eb] border border-orange-100 rounded-2xl p-6 relative overflow-hidden">
-            <div className="text-5xl font-serif text-orange-200 leading-none absolute top-1 left-2 select-none opacity-60">
-              “
-            </div>
-            
-            <div className="relative z-10 pt-3 pb-1">
-              <h4 className="text-2xl font-black text-gray-900 tracking-tight leading-snug italic font-serif">
-                Great teams build great companies.
-              </h4>
-              <div className="w-20 h-1 bg-[#f9571c] rounded-full mt-3"></div>
+              {/* Delete Company */}
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(true)}
+                className="w-full flex items-center justify-between p-3 rounded-xl bg-gray-50 hover:bg-red-50/60 border border-gray-100 hover:border-red-200 transition-colors text-xs font-bold text-gray-800 group cursor-pointer"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-7 h-7 rounded-lg bg-red-100 text-red-600 flex items-center justify-center">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </div>
+                  <span className="text-red-600">Delete Company</span>
+                </div>
+                <ChevronRight className="w-4 h-4 text-red-500 group-hover:translate-x-0.5 transition-transform" />
+              </button>
             </div>
           </div>
 
@@ -712,16 +932,15 @@ const CompanyForm = () => {
 
       </div>
 
-      {/* Live Company Preview Modal */}
+      {/* View Public Profile Modal */}
       {showPreviewModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-xl w-full space-y-6 shadow-2xl border border-gray-100 relative max-h-[90vh] overflow-y-auto">
             
-            {/* Modal Header */}
             <div className="flex items-center justify-between pb-4 border-b border-gray-100">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-[#f9571c]" />
-                <h3 className="text-lg font-black text-gray-900">Job Portal Company Card Preview</h3>
+                <h3 className="text-lg font-black text-gray-900">Live Public Profile Preview</h3>
               </div>
               <button
                 onClick={() => setShowPreviewModal(false)}
@@ -731,40 +950,38 @@ const CompanyForm = () => {
               </button>
             </div>
 
-            {/* Simulated Live Company Card */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-md space-y-5">
+            <div className="bg-white rounded-2xl p-6 border border-gray-200 shadow-xs space-y-5">
               <div className="flex items-start gap-4">
-                <div className="w-16 h-16 rounded-xl border border-gray-200 flex items-center justify-center shrink-0 overflow-hidden bg-gray-50 p-1 shadow-2xs">
+                <div className="w-16 h-16 rounded-xl border border-gray-200 flex items-center justify-center shrink-0 overflow-hidden bg-gray-900 p-1 shadow-2xs">
                   {logoPreview ? (
                     <img src={logoPreview} alt="Logo" className="w-full h-full object-contain" />
                   ) : (
-                    <div className="w-full h-full bg-gray-900 text-white font-extrabold text-2xl flex items-center justify-center rounded-lg">
-                      {formData.name ? formData.name.charAt(0).toUpperCase() : 'C'}
-                    </div>
+                    <span className="text-amber-500 font-extrabold text-2xl">
+                      {formData.name ? formData.name.charAt(0).toUpperCase() : 'T'}
+                    </span>
                   )}
                 </div>
 
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <h4 className="text-xl font-extrabold text-gray-900">
-                      {formData.name || 'Your Company Name'}
+                      {formData.name || 'TechNova Solutions'}
                     </h4>
                     <span className="px-2.5 py-0.5 text-[11px] font-bold rounded-md bg-emerald-100 text-emerald-700 border border-emerald-200">
                       {formData.status || 'Active'}
                     </span>
                   </div>
                   <p className="text-xs font-semibold text-[#f9571c]">
-                    {formData.industry || 'Selected Industry'} {formData.companyType ? `• ${formData.companyType}` : ''}
+                    {formData.industry || 'Information Technology'} {formData.companyType ? `• ${formData.companyType}` : ''}
                   </p>
                 </div>
               </div>
 
-              {/* Badges line */}
               <div className="flex items-center gap-4 text-xs text-gray-600 flex-wrap border-y border-gray-100 py-3">
                 <div className="flex items-center gap-1">
                   <MapPin className="w-3.5 h-3.5 text-gray-400" />
                   <span>
-                    {[formData.city, formData.state, formData.country].filter(Boolean).join(', ') || 'Location details'}
+                    {[formData.city, formData.state, formData.country].filter(Boolean).join(', ') || 'Bangalore, Karnataka, India'}
                   </span>
                 </div>
                 {formData.companySize && (
@@ -779,9 +996,9 @@ const CompanyForm = () => {
                     <span>Founded {formData.foundedYear}</span>
                   </div>
                 )}
-                {formData.website && (
+                {(formData.website || formData.socialWebsite) && (
                   <a
-                    href={formData.website}
+                    href={formData.website || formData.socialWebsite}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center gap-1 text-[#f9571c] hover:underline"
@@ -793,23 +1010,92 @@ const CompanyForm = () => {
               </div>
 
               <div>
-                <h5 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">About Us</h5>
+                <h5 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">About Company</h5>
                 <p className="text-xs text-gray-600 leading-relaxed">
-                  {formData.shortDescription || formData.fullDescription || 'Company description will appear here...'}
+                  {formData.shortDescription || 'Company short description preview.'}
                 </p>
               </div>
+
+              <div>
+                <h5 className="text-xs font-bold text-gray-700 uppercase tracking-wider mb-1">Full Description</h5>
+                <p className="text-xs text-gray-600 leading-relaxed whitespace-pre-line">
+                  {formData.fullDescription || 'Company full description preview.'}
+                </p>
+              </div>
+
+              {(formData.linkedin || formData.twitter || formData.socialWebsite) && (
+                <div className="pt-2 border-t border-gray-100 flex items-center gap-3 text-xs">
+                  <span className="font-bold text-gray-700">Connect:</span>
+                  {formData.linkedin && (
+                    <a href={formData.linkedin} target="_blank" rel="noreferrer" className="text-sky-600 font-semibold hover:underline">
+                      LinkedIn
+                    </a>
+                  )}
+                  {formData.twitter && (
+                    <a href={formData.twitter} target="_blank" rel="noreferrer" className="text-gray-800 font-semibold hover:underline">
+                      Twitter/X
+                    </a>
+                  )}
+                  {formData.socialWebsite && (
+                    <a href={formData.socialWebsite} target="_blank" rel="noreferrer" className="text-[#f9571c] font-semibold hover:underline">
+                      Website
+                    </a>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Modal Footer */}
-            <div className="pt-2 text-right">
+            <div className="flex justify-end">
               <button
                 onClick={() => setShowPreviewModal(false)}
-                className="px-5 py-2 bg-gray-900 text-white font-bold text-xs rounded-xl hover:bg-gray-800 transition-colors"
+                className="px-5 py-2 bg-[#f9571c] text-white font-bold text-xs rounded-xl hover:bg-[#e04810] transition-colors"
               >
                 Close Preview
               </button>
             </div>
+          </div>
+        </div>
+      )}
 
+      {/* Delete Company Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-3xl p-6 sm:p-7 max-w-md w-full space-y-5 shadow-2xl border border-gray-100">
+            <div className="w-12 h-12 rounded-2xl bg-red-100 text-red-600 flex items-center justify-center mx-auto">
+              <Trash2 className="w-6 h-6" />
+            </div>
+            
+            <div className="text-center space-y-1.5">
+              <h3 className="text-lg font-extrabold text-gray-900">Delete Company?</h3>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Are you sure you want to delete <span className="font-bold text-gray-800">{formData.name || 'this company'}</span>? This action cannot be undone and will affect associated jobs.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowDeleteModal(false)}
+                className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold text-xs rounded-xl transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDelete}
+                disabled={deleting}
+                className="flex-1 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {deleting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Deleting...</span>
+                  </>
+                ) : (
+                  <span>Delete Company</span>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       )}

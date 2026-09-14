@@ -108,22 +108,28 @@ const RecruiterLayout = ({ children }) => {
             })}
 
             {/* Sidebar Employer Brand Promotion Card */}
-            <div className="mt-8 p-4 bg-gradient-to-br from-orange-50/80 to-amber-50/80 rounded-2xl border border-orange-100 text-center relative overflow-hidden">
-              <div className="w-16 h-12 mx-auto mb-2 flex items-center justify-center">
-                <div className="w-12 h-10 bg-[#f9571c] rounded-xl flex items-center justify-center text-white shadow-sm relative">
-                  <Building className="w-6 h-6" />
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-orange-400 rounded-full flex items-center justify-center text-[10px] font-bold text-white border-2 border-white">+</span>
+            <div className="mt-8 p-4 bg-[#fef5f0] rounded-2xl border border-orange-100 text-center relative overflow-hidden">
+              <div className="w-20 h-16 mx-auto mb-3 flex items-center justify-center relative">
+                <div className="flex items-end gap-1.5 justify-center">
+                  <div className="w-6 h-10 bg-[#3a4454] rounded-t-sm flex flex-col justify-end p-0.5 gap-0.5">
+                    <div className="w-1.5 h-1.5 bg-amber-200 rounded-xs mx-auto"></div>
+                    <div className="w-1.5 h-1.5 bg-amber-200 rounded-xs mx-auto"></div>
+                  </div>
+                  <div className="w-9 h-14 bg-[#f9571c] rounded-t-sm flex flex-col items-center justify-start pt-1 gap-1">
+                    <div className="w-2 h-2 bg-white rounded-xs"></div>
+                    <div className="w-2 h-2 bg-white rounded-xs"></div>
+                    <div className="w-2 h-2 bg-white rounded-xs"></div>
+                  </div>
+                  <div className="w-5 h-8 bg-[#2d3748] rounded-t-sm"></div>
                 </div>
               </div>
-              <h4 className="font-bold text-gray-900 text-xs mb-1">Build your employer brand</h4>
-              <p className="text-[11px] text-gray-500 leading-snug mb-3">Attract top talent with a strong company profile.</p>
-              <button
-                onClick={() => navigate('/recruiter/companies/new')}
-                className="w-full bg-[#f9571c] hover:bg-[#e04810] text-white font-bold text-xs py-2 px-3 rounded-xl shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <span>Create Company</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              <h4 className="font-extrabold text-gray-900 text-sm mb-1.5 leading-snug">Manage your company presence</h4>
+              <p className="text-xs text-gray-500 leading-snug">Keep your company details updated to attract top talent.</p>
+              <div className="mt-3 flex justify-center">
+                <svg className="w-16 h-3 text-[#f9571c]" viewBox="0 0 100 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 15 Q 50 2 95 12" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                </svg>
+              </div>
             </div>
           </div>
 
