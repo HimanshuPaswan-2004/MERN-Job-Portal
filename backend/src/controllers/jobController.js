@@ -1,5 +1,6 @@
 import Job from '../models/Job.js';
 import Company from '../models/Company.js';
+import Application from '../models/Application.js';
 
 // @desc    Create a job
 // @route   POST /api/jobs
@@ -132,13 +133,110 @@ export const getJobById = async (req, res, next) => {
 // @access  Private/Recruiter
 export const getMyJobs = async (req, res, next) => {
   try {
-    const jobs = await Job.find({ recruiter: req.user._id })
+    const { search, status, jobType, location, company, sortBy } = req.query;
+
+    // Fetch all recruiter jobs for summary statistics calculation
+    const allRecruiterJobs = await Job.find({ recruiter: req.user._id }).populate('company', 'name logo');
+
+    const totalJobs = allRecruiterJobs.length;
+    const activeJobs = allRecruiterJobs.filter(j => j.status === 'active').length;
+    const pausedJobs = allRecruiterJobs.filter(j => j.status === 'paused').length;
+    const closedJobs = allRecruiterJobs.filter(j => j.status === 'closed').length;
+
+    // Extract unique companies & locations for filter dropdown options
+    const companies = Array.from(new Set(allRecruiterJobs.map(j => j.company?.name).filter(Boolean)));
+    const locations = Array.from(new Set(allRecruiterJobs.map(j => j.location).filter(Boolean)));
+
+    // Construct filter query for job list
+    const query = { recruiter: req.user._id };
+
+    if (search && search.trim() !== '') {
+      const searchRegex = new RegExp(search.trim(), 'i');
+      query.$or = [
+        { title: searchRegex },
+        { location: searchRegex },
+        { skills: { $in: [searchRegex] } }
+      ];
+    }
+
+    if (status && status.toLowerCase() !== 'all status' && status.toLowerCase() !== 'all') {
+      query.status = status.toLowerCase();
+    }
+
+    if (jobType && jobType.toLowerCase() !== 'all types' && jobType.toLowerCase() !== 'all') {
+      query.jobType = jobType.toLowerCase();
+    }
+
+    if (location && location.toLowerCase() !== 'all locations' && location.toLowerCase() !== 'all') {
+      query.location = { $regex: location, $options: 'i' };
+    }
+
+    if (company && company.toLowerCase() !== 'all companies' && company.toLowerCase() !== 'all') {
+      const targetCompany = allRecruiterJobs.find(j => j.company?.name === company || j.company?._id?.toString() === company);
+      if (targetCompany?.company?._id) {
+        query.company = targetCompany.company._id;
+      }
+    }
+
+    let sortOptions = { createdAt: -1 };
+    if (sortBy === 'oldest') sortOptions = { createdAt: 1 };
+
+    let jobs = await Job.find(query)
       .populate('company', 'name logo')
-      .sort({ createdAt: -1 });
+      .sort(sortOptions);
+
+    // Compute application stats per job using Application model
+    const jobIds = jobs.map(j => j._id);
+    const appStatsArr = await Application.aggregate([
+      { $match: { job: { $in: jobIds } } },
+      {
+        $group: {
+          _id: '$job',
+          totalApplicants: { $sum: 1 },
+          inReviewCount: {
+            $sum: { $cond: [{ $eq: ['$status', 'In Review'] }, 1, 0] }
+          },
+          interviewsCount: {
+            $sum: { $cond: [{ $in: ['$status', ['Shortlisted', 'Hired']] }, 1, 0] }
+          }
+        }
+      }
+    ]);
+
+    const statsMap = {};
+    appStatsArr.forEach(stat => {
+      statsMap[stat._id.toString()] = {
+        totalApplicants: stat.totalApplicants,
+        inReviewCount: stat.inReviewCount,
+        interviewsCount: stat.interviewsCount
+      };
+    });
+
+    const jobsWithStats = jobs.map(job => {
+      const jObj = job.toObject();
+      jObj.stats = statsMap[job._id.toString()] || {
+        totalApplicants: 0,
+        inReviewCount: 0,
+        interviewsCount: 0
+      };
+      return jObj;
+    });
+
+    if (sortBy === 'most_applicants' || sortBy === 'most applicants') {
+      jobsWithStats.sort((a, b) => b.stats.totalApplicants - a.stats.totalApplicants);
+    }
 
     res.status(200).json({
       success: true,
-      data: jobs,
+      summary: {
+        totalJobs,
+        activeJobs,
+        pausedJobs,
+        closedJobs
+      },
+      companies,
+      locations,
+      data: jobsWithStats,
     });
   } catch (error) {
     next(error);
