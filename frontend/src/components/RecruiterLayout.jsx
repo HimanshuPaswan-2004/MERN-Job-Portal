@@ -108,25 +108,25 @@ const RecruiterLayout = ({ children }) => {
             })}
 
             {/* Sidebar Employer Promotion Card */}
-            <div className="mt-6 p-4 bg-[#fff6f0] rounded-2xl border border-orange-100/80 text-left relative overflow-hidden">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center text-[#f9571c] shrink-0">
-                  <svg className="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
-                    <circle cx="12" cy="8" r="4" />
-                    <path d="M6 21v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2" />
-                    <rect x="15" y="3" width="6" height="5" rx="1" fill="#f9571c" stroke="none"/>
-                  </svg>
-                </div>
+            <div className="mt-6 p-4 bg-[#fff5ee] rounded-2xl border border-orange-100 text-left relative overflow-hidden space-y-2">
+              <div className="flex items-center justify-center py-2">
+                <svg className="w-24 h-20 text-[#f9571c]" viewBox="0 0 100 80" fill="none">
+                  {/* Person with laptop illustration */}
+                  <rect x="35" y="45" width="40" height="25" rx="3" fill="#334155" />
+                  <polygon points="30,70 80,70 75,74 35,74" fill="#64748b" />
+                  <circle cx="50" cy="22" r="10" fill="#f9571c" />
+                  <path d="M30 45 C30 32, 70 32, 70 45" fill="#fb923c" />
+                  <path d="M22 20 Q15 25 18 35" stroke="#f9571c" strokeWidth="3" strokeLinecap="round" />
+                  <path d="M78 20 Q85 25 82 35" stroke="#f9571c" strokeWidth="3" strokeLinecap="round" />
+                </svg>
               </div>
-              <h4 className="font-extrabold text-gray-900 text-sm mb-1 leading-snug">Hire the right talent, faster.</h4>
-              <p className="text-xs text-gray-600 leading-relaxed mb-3">Post jobs, manage applications and build great teams.</p>
-              <Link
-                to="/recruiter/jobs/new"
-                className="inline-flex items-center gap-1.5 w-full justify-center bg-[#f9571c] hover:bg-[#e04810] text-white text-xs font-bold py-2 px-3 rounded-xl shadow-xs transition-colors"
-              >
-                <span>Post a New Job</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+              <h4 className="font-extrabold text-gray-900 text-sm leading-snug">
+                Find the right <br /> talent faster.
+              </h4>
+              <p className="text-xs text-gray-500 leading-relaxed">
+                Post jobs, review applicants and build amazing teams.
+              </p>
+              <div className="w-16 h-1 bg-gradient-to-r from-[#f9571c] to-amber-400 rounded-full mt-1"></div>
             </div>
           </div>
 

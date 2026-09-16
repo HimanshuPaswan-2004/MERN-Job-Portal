@@ -22,19 +22,8 @@ export const createJob = async (req, res, next) => {
     }
 
     const job = await Job.create({
-      title,
-      company,
+      ...req.body,
       recruiter: req.user._id,
-      description,
-      location,
-      jobType,
-      experienceLevel,
-      salary,
-      skills,
-      responsibilities,
-      requirements,
-      vacancies,
-      remote,
     });
 
     res.status(201).json({

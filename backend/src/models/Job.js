@@ -59,6 +59,32 @@ const jobSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  workMode: {
+    type: String,
+  },
+  locationType: {
+    type: String,
+  },
+  country: {
+    type: String,
+    default: 'India',
+  },
+  city: {
+    type: String,
+  },
+  address: {
+    type: String,
+  },
+  applicationDeadline: {
+    type: Date,
+  },
+  currency: {
+    type: String,
+    default: 'INR',
+  },
+  salaryText: {
+    type: String,
+  },
   status: {
     type: String,
     enum: ['draft', 'active', 'paused', 'closed', 'expired'],
