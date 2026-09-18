@@ -49,7 +49,9 @@ const RecruiterLayout = ({ children }) => {
           <div className="w-9 h-9 bg-[#f9571c] rounded-xl flex items-center justify-center text-white shadow-xs">
             <Briefcase className="w-5 h-5 stroke-[2.5]" />
           </div>
-          <span className="text-xl font-black text-gray-900 tracking-tight">JobPortal</span>
+          <span className="text-xl font-extrabold text-gray-900 tracking-tight">
+            Job<span className="text-[#f9571c]">Portal</span>
+          </span>
         </Link>
 
         {/* Global Search Bar */}
@@ -59,20 +61,20 @@ const RecruiterLayout = ({ children }) => {
             <input
               type="text"
               placeholder="Search candidates, jobs, companies..."
-              className="w-full pl-10 pr-4 py-2 text-sm bg-gray-50 border border-gray-200 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400"
+              className="w-full pl-10 pr-4 py-2 text-xs bg-gray-50/80 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#f9571c]/20 focus:border-[#f9571c] transition-all placeholder:text-gray-400 text-gray-700 font-medium"
             />
           </div>
         </div>
 
         {/* Header Right Actions */}
         <div className="flex items-center gap-4">
-          <button className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer">
-            <Bell className="w-5 h-5" />
+          <button className="relative p-2 text-gray-600 hover:bg-gray-100 rounded-xl transition-colors cursor-pointer">
+            <Bell className="w-5 h-5 text-gray-600" />
             <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[#f9571c] rounded-full border-2 border-white"></span>
           </button>
           
           <div className="flex items-center gap-3 pl-3 border-l border-gray-200 cursor-pointer">
-            <div className="w-10 h-10 bg-gray-900 text-white font-bold rounded-full flex items-center justify-center text-sm shadow-xs">
+            <div className="w-9 h-9 bg-[#23272e] text-white font-black rounded-full flex items-center justify-center text-sm shadow-xs">
               {user?.name ? user.name.charAt(0).toUpperCase() : 'T'}
             </div>
             <div className="hidden sm:block text-left">
@@ -95,9 +97,9 @@ const RecruiterLayout = ({ children }) => {
                 <Link
                   key={item.name}
                   to={item.path}
-                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm transition-all ${
+                  className={`w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-xs transition-all ${
                     isActive
-                      ? 'bg-orange-50 text-[#f9571c] font-bold border-l-4 border-[#f9571c] rounded-l-none'
+                      ? 'bg-[#fff5ee] text-[#f9571c] font-bold shadow-2xs'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
@@ -108,25 +110,36 @@ const RecruiterLayout = ({ children }) => {
             })}
 
             {/* Sidebar Employer Promotion Card */}
-            <div className="mt-6 p-4 bg-[#fff5ee] rounded-2xl border border-orange-100 text-left relative overflow-hidden space-y-2">
-              <div className="flex items-center justify-center py-2">
-                <svg className="w-24 h-20 text-[#f9571c]" viewBox="0 0 100 80" fill="none">
-                  {/* Person with laptop illustration */}
-                  <rect x="35" y="45" width="40" height="25" rx="3" fill="#334155" />
-                  <polygon points="30,70 80,70 75,74 35,74" fill="#64748b" />
-                  <circle cx="50" cy="22" r="10" fill="#f9571c" />
-                  <path d="M30 45 C30 32, 70 32, 70 45" fill="#fb923c" />
-                  <path d="M22 20 Q15 25 18 35" stroke="#f9571c" strokeWidth="3" strokeLinecap="round" />
-                  <path d="M78 20 Q85 25 82 35" stroke="#f9571c" strokeWidth="3" strokeLinecap="round" />
+            <div className="mt-8 p-4 bg-[#fff5ee] rounded-2xl border border-orange-100 text-left relative overflow-hidden space-y-2">
+              <div className="flex items-center justify-center py-2 relative">
+                <svg className="w-28 h-24" viewBox="0 0 120 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  {/* Background burst rays */}
+                  <path d="M20 20 L25 15 M95 20 L90 15 M15 50 L10 50 M105 50 L110 50" stroke="#f9571c" strokeWidth="2" strokeLinecap="round" opacity="0.4" />
+                  {/* Person head */}
+                  <circle cx="60" cy="30" r="10" fill="#2d3748" />
+                  <path d="M54 26 C54 22 66 22 66 26 C66 28 64 30 60 30 C56 30 54 28 54 26 Z" fill="#1a202c" />
+                  {/* Body / Shirt */}
+                  <path d="M42 58 C42 44 78 44 78 58 L78 68 L42 68 Z" fill="#f9571c" />
+                  {/* Arms & Laptop */}
+                  <path d="M45 52 L35 62 L55 62" stroke="#f9571c" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M75 52 L85 62 L65 62" stroke="#f9571c" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+                  {/* Laptop Base & Screen */}
+                  <rect x="48" y="52" width="24" height="15" rx="2" fill="#334155" />
+                  <polygon points="44,67 76,67 74,70 46,70" fill="#64748b" />
                 </svg>
               </div>
               <h4 className="font-extrabold text-gray-900 text-sm leading-snug">
                 Find the right <br /> talent faster.
               </h4>
-              <p className="text-xs text-gray-500 leading-relaxed">
+              <p className="text-[11px] text-gray-500 leading-relaxed">
                 Post jobs, review applicants and build amazing teams.
               </p>
-              <div className="w-16 h-1 bg-gradient-to-r from-[#f9571c] to-amber-400 rounded-full mt-1"></div>
+              {/* Curved orange brush accent */}
+              <div className="pt-1">
+                <svg className="w-20 h-3 text-[#f9571c]" viewBox="0 0 80 12" fill="none">
+                  <path d="M2 8 Q 40 1 78 7" stroke="#f9571c" strokeWidth="3" strokeLinecap="round" />
+                </svg>
+              </div>
             </div>
           </div>
 

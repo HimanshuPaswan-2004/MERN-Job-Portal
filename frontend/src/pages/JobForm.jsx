@@ -792,7 +792,7 @@ const JobForm = () => {
                 {skillBadges.slice(0, 4).map((sk, index) => (
                   <span
                     key={index}
-                    className="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-gray-100 text-gray-700"
+                    className="px-2.5 py-1 rounded-lg text-[11px] font-medium bg-[#eef2f6] text-[#334155]"
                   >
                     {sk}
                   </span>
@@ -817,23 +817,33 @@ const JobForm = () => {
           </div>
 
           {/* Widget 3: Graphic Illustration Banner */}
-          <div className="bg-[#fff5ee] rounded-2xl p-6 border border-orange-100 text-center relative overflow-hidden flex flex-col items-center justify-center space-y-3">
+          <div className="bg-[#fff5ee] rounded-2xl p-6 border border-orange-100 text-center relative overflow-hidden flex flex-col items-center justify-center space-y-4 shadow-2xs">
             <div className="relative w-24 h-24 flex items-center justify-center">
-              {/* Target / Dart Illustration */}
-              <svg className="w-20 h-20 text-[#f9571c]" viewBox="0 0 100 100" fill="none">
-                <circle cx="50" cy="50" r="40" stroke="#f9571c" strokeWidth="6" strokeDasharray="6 6" opacity="0.4" />
-                <circle cx="50" cy="50" r="28" stroke="#f9571c" strokeWidth="6" />
-                <circle cx="50" cy="50" r="14" fill="#f9571c" />
-                <path d="M50 10 L50 22 M50 78 L50 90 M10 50 L22 50 M78 50 L90 50" stroke="#f9571c" strokeWidth="4" strokeLinecap="round" />
-                <path d="M65 35 L85 15 M78 15 L85 15 L85 22" stroke="#f9571c" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+              {/* Target / Dartboard SVG Graphic matching mockup */}
+              <svg className="w-20 h-20" viewBox="0 0 100 100" fill="none">
+                {/* Outer dashed ring */}
+                <circle cx="45" cy="55" r="32" stroke="#f9571c" strokeWidth="4" strokeDasharray="4 4" opacity="0.4" />
+                {/* Middle ring */}
+                <circle cx="45" cy="55" r="22" stroke="#f9571c" strokeWidth="4" />
+                {/* Bullseye */}
+                <circle cx="45" cy="55" r="10" fill="#f9571c" />
+                {/* Dart Arrow */}
+                <path d="M78 22 L49 51" stroke="#f9571c" strokeWidth="4" strokeLinecap="round" />
+                <polygon points="78,22 88,12 80,10 74,16" fill="#f9571c" />
+                <polygon points="78,22 88,32 90,26 84,20" fill="#f9571c" />
               </svg>
             </div>
 
-            <div className="space-y-1">
-              <h4 className="font-black text-gray-900 text-lg tracking-tight leading-tight">
+            <div className="space-y-2">
+              <h4 className="font-extrabold text-gray-900 text-lg tracking-tight leading-tight">
                 Great people <br /> build great products.
               </h4>
-              <div className="w-24 h-1.5 mx-auto bg-gradient-to-r from-transparent via-[#f9571c] to-transparent rounded-full opacity-80"></div>
+              {/* Hand-drawn orange stroke underline */}
+              <div className="flex justify-center pt-1">
+                <svg className="w-28 h-3 text-[#f9571c]" viewBox="0 0 100 12" fill="none">
+                  <path d="M3 8 Q 50 1 97 7" stroke="#f9571c" strokeWidth="3" strokeLinecap="round" />
+                </svg>
+              </div>
             </div>
           </div>
 
