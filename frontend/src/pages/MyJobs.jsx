@@ -400,7 +400,7 @@ const MyJobs = () => {
                       {/* Action Buttons */}
                       <div className="flex items-center gap-2">
                         <Link
-                          to={`/recruiter/jobs`}
+                          to={`/recruiter/applicants?jobId=${job._id}`}
                           className="px-4 py-2 bg-white hover:bg-orange-50 text-[#f9571c] font-bold text-xs border border-orange-200 rounded-xl shadow-2xs transition-colors flex items-center gap-1.5"
                         >
                           <Eye className="w-3.5 h-3.5" />

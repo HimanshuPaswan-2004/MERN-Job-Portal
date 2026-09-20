@@ -17,6 +17,7 @@ import JobDetails from './pages/JobDetails';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import MyApplications from './pages/MyApplications';
+import JobApplicants from './pages/JobApplicants';
 import RecruiterLayout from './components/RecruiterLayout';
 
 // Dummy components for now
@@ -115,6 +116,8 @@ const AppContent = () => {
             <Route path="/recruiter/jobs" element={<RecruiterLayout><MyJobs /></RecruiterLayout>} />
             <Route path="/recruiter/jobs/new" element={<RecruiterLayout><JobForm /></RecruiterLayout>} />
             <Route path="/recruiter/jobs/:id/edit" element={<RecruiterLayout><JobForm /></RecruiterLayout>} />
+            <Route path="/recruiter/applicants" element={<JobApplicants />} />
+            <Route path="/recruiter/jobs/:jobId/applicants" element={<JobApplicants />} />
           </Route>
         </Routes>
       </main>

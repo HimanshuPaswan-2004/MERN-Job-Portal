@@ -34,7 +34,7 @@ const RecruiterLayout = ({ children }) => {
     { name: 'My Companies', path: '/recruiter/companies', icon: Building2 },
     { name: 'My Jobs', path: '/recruiter/jobs', icon: FileText },
     { name: 'Post a Job', path: '/recruiter/jobs/new', icon: PlusCircle },
-    { name: 'Applicants', path: '/recruiter/jobs', icon: Users },
+    { name: 'Applicants', path: '/recruiter/applicants', icon: Users },
     { name: 'Messages', path: '#', icon: MessageSquare },
     { name: 'Profile', path: '/candidate/profile', icon: User },
     { name: 'Settings', path: '#', icon: Settings },
@@ -92,7 +92,7 @@ const RecruiterLayout = ({ children }) => {
           <div className="space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
-              const isActive = location.pathname === item.path;
+              const isActive = item.path !== '#' && (location.pathname === item.path || location.pathname.startsWith(item.path + '/'));
               return (
                 <Link
                   key={item.name}
