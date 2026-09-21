@@ -121,6 +121,8 @@ const AppContent = () => {
           </Route>
         </Routes>
       </main>
+
+      {!isAuthPage && !isRecruiterPage && <Footer />}
     </div>
   );
 };
