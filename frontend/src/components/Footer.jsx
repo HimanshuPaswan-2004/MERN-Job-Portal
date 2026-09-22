@@ -1,20 +1,8 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { Briefcase, Globe, Mail, MessageCircle, Heart, Send, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
+import { Briefcase, Globe, Mail, MessageCircle, Heart, ArrowRight, ShieldCheck, Zap } from 'lucide-react';
 
 const Footer = () => {
-  const [email, setEmail] = useState('');
-  const [subscribed, setSubscribed] = useState(false);
-
-  const handleSubscribe = (e) => {
-    e.preventDefault();
-    if (email.trim()) {
-      setSubscribed(true);
-      setEmail('');
-      setTimeout(() => setSubscribed(false), 4000);
-    }
-  };
-
   const quickLinks = [
     { name: 'Home', path: '/' },
     { name: 'Browse Jobs', path: '/jobs' },
@@ -32,52 +20,12 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-slate-900 pt-20 text-white relative overflow-hidden">
+    <footer className="bg-slate-900 pt-12 text-white relative overflow-hidden">
       {/* Decorative gradient overlay */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-brand-600/10 rounded-full blur-3xl pointer-events-none"></div>
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        
-        {/* Newsletter Banner */}
-        <div className="bg-gradient-to-r from-brand-600 to-orange-500 rounded-3xl p-8 lg:p-12 mb-16 shadow-2xl relative overflow-hidden flex flex-col lg:flex-row items-center justify-between gap-8">
-          <div className="max-w-xl text-center lg:text-left">
-            <span className="bg-white/20 text-white text-xs font-extrabold px-3 py-1 rounded-full uppercase tracking-wider inline-flex items-center gap-1.5 mb-3">
-              <Zap size={14} /> Stay Ahead
-            </span>
-            <h3 className="text-2xl lg:text-3xl font-extrabold text-white tracking-tight">
-              Get weekly job alerts matching your skills
-            </h3>
-            <p className="text-brand-100 text-sm mt-2">
-              Subscribe to our newsletter and never miss top career opportunities.
-            </p>
-          </div>
-
-          <form onSubmit={handleSubscribe} className="w-full lg:w-auto flex-1 max-w-md">
-            <div className="flex bg-white/10 backdrop-blur-md p-1.5 rounded-full border border-white/20">
-              <input
-                type="email"
-                required
-                placeholder="Enter your email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-5 py-3 bg-transparent text-white placeholder-brand-200 outline-none text-sm"
-              />
-              <button
-                type="submit"
-                className="bg-white text-brand-600 font-bold px-6 py-3 rounded-full hover:bg-brand-50 transition-all flex items-center gap-2 text-sm shadow-md shrink-0"
-              >
-                {subscribed ? 'Subscribed!' : 'Subscribe'} <Send size={15} />
-              </button>
-            </div>
-            {subscribed && (
-              <p className="text-xs text-brand-100 mt-2 text-center font-medium">
-                Awesome! You have been added to our job alert list.
-              </p>
-            )}
-          </form>
-        </div>
-
         {/* Footer Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 pb-16 border-b border-slate-800">
           
