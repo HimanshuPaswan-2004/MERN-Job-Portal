@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const ProtectedRoute = ({ allowedRoles }) => {
@@ -14,7 +14,15 @@ const ProtectedRoute = ({ allowedRoles }) => {
     );
   }
 
-  // Allow seamless browsing across recruiter and candidate pages
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (allowedRoles && allowedRoles.length > 0 && !allowedRoles.includes(user.role)) {
+    const targetPath = user.role === 'recruiter' ? '/recruiter/dashboard' : '/candidate/dashboard';
+    return <Navigate to={targetPath} replace />;
+  }
+
   return <Outlet />;
 };
 

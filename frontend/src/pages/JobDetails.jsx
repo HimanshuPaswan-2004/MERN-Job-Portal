@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import { 
   MapPin, Briefcase, BarChart, IndianRupee, Bookmark, Share2, 
   Users, Building, ChevronRight, Home, ExternalLink, ArrowRight, Clock, 
@@ -59,17 +60,34 @@ const JobDetails = () => {
     setTimeout(() => setToastMessage(''), 3000);
   };
 
+  const { user } = useAuth();
+
   const handleApply = async () => {
     if (hasApplied) return;
+    if (!user) {
+      navigate('/login');
+      return;
+    }
+    if (user.role !== 'candidate') {
+      showToast('⚠️ Recruiters cannot apply for jobs. Please log in as a candidate.');
+      return;
+    }
+
     setApplying(true);
     try {
-      // Simulate/call apply endpoint
-      const res = await axios.get(`/api/applications/apply/${id}`).catch(() => null);
-      setHasApplied(true);
-      showToast('🎉 Application submitted successfully!');
+      const res = await axios.post(`/api/applications/${id}`);
+      if (res.data.success) {
+        setHasApplied(true);
+        showToast('🎉 Application submitted successfully!');
+      }
     } catch (err) {
-      setHasApplied(true);
-      showToast('🎉 Application submitted successfully!');
+      const errorMsg = err.response?.data?.message || 'Failed to submit application.';
+      if (errorMsg.toLowerCase().includes('already applied')) {
+        setHasApplied(true);
+        showToast('ℹ️ You have already applied for this position.');
+      } else {
+        showToast(`⚠️ ${errorMsg}`);
+      }
     } finally {
       setApplying(false);
     }

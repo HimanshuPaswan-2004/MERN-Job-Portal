@@ -32,6 +32,7 @@ const SidebarItem = ({ icon, label, to, isActive }) => (
 
 const CandidateLayout = ({ children }) => {
   const location = useLocation();
+  const { logout } = useAuth();
   const isActive = (path) => location.pathname === path;
   
   return (
@@ -43,20 +44,21 @@ const CandidateLayout = ({ children }) => {
         <SidebarItem icon={<Search size={20}/>} label="Browse Jobs" to="/jobs" isActive={isActive('/jobs')} />
         <SidebarItem icon={<FileText size={20}/>} label="My Applications" to="/candidate/applications" isActive={isActive('/candidate/applications')} />
         <SidebarItem icon={<UserIcon size={20}/>} label="My Profile" to="/candidate/profile" isActive={isActive('/candidate/profile')} />
-        <SidebarItem icon={<FileCode size={20}/>} label="Resume" />
-        <SidebarItem icon={<Bookmark size={20}/>} label="Saved Jobs" />
-        <SidebarItem icon={<Bell size={20}/>} label="Job Alerts" />
+        <SidebarItem icon={<FileCode size={20}/>} label="Resume" to="/candidate/profile" />
+        <SidebarItem icon={<Bookmark size={20}/>} label="Saved Jobs" to="/jobs" />
         
         <div className="mt-8 mb-4 px-4 bg-orange-50 rounded-2xl p-4 text-center border border-orange-100">
            <div className="w-10 h-10 bg-brand-100 text-brand-600 flex items-center justify-center rounded-full mx-auto mb-3"><Briefcase size={20}/></div>
            <h4 className="font-bold text-gray-900 text-sm mb-1">Get noticed by top companies</h4>
            <p className="text-xs text-gray-500 mb-3">Complete your profile and increase your chances of getting hired.</p>
-           <button className="w-full bg-brand-600 text-white font-bold text-xs py-2 rounded-lg">Complete Profile &rarr;</button>
+           <Link to="/candidate/profile/edit" className="block w-full bg-brand-600 text-white font-bold text-xs py-2 rounded-lg">Complete Profile &rarr;</Link>
         </div>
       </div>
       <div className="p-4 border-t border-gray-100">
-        <SidebarItem icon={<Settings size={20}/>} label="Settings" />
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 font-medium hover:bg-red-50 hover:text-red-600 transition-colors">
+        <button
+          onClick={logout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 font-medium hover:bg-red-50 hover:text-red-600 transition-colors"
+        >
           <LogOut size={20}/>
           <span>Logout</span>
         </button>

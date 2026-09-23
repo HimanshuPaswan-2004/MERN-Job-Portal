@@ -8,13 +8,29 @@ const Navbar = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const navLinks = [
+  let navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Jobs', path: '/jobs' },
+    { name: 'Browse Jobs', path: '/jobs' },
     { name: 'Companies', path: '/recruiter/companies' },
-    { name: 'For Candidates', path: '/candidate/dashboard' },
-    { name: 'For Recruiters', path: '/recruiter/dashboard' },
   ];
+
+  if (user?.role === 'candidate') {
+    navLinks = [
+      { name: 'Home', path: '/' },
+      { name: 'Browse Jobs', path: '/jobs' },
+      { name: 'Dashboard', path: '/candidate/dashboard' },
+      { name: 'My Applications', path: '/candidate/applications' },
+      { name: 'My Profile', path: '/candidate/profile' },
+    ];
+  } else if (user?.role === 'recruiter') {
+    navLinks = [
+      { name: 'Home', path: '/' },
+      { name: 'Dashboard', path: '/recruiter/dashboard' },
+      { name: 'My Companies', path: '/recruiter/companies' },
+      { name: 'My Jobs', path: '/recruiter/jobs' },
+      { name: 'Applicants', path: '/recruiter/applicants' },
+    ];
+  }
 
   return (
     <header className="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-gray-100 shadow-xs transition-all duration-300">
@@ -57,14 +73,20 @@ const Navbar = () => {
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center space-x-3">
             {user ? (
-              <div className="flex items-center gap-3 bg-gray-50 p-1.5 pl-3 rounded-full border border-gray-200/80">
-                <span className="text-xs font-bold text-gray-700 flex items-center gap-1.5">
+              <div className="flex items-center gap-3 bg-gray-50 p-1.5 pl-3 pr-2 rounded-full border border-gray-200/80">
+                <Link
+                  to={user.role === 'recruiter' ? '/recruiter/dashboard' : '/candidate/dashboard'}
+                  className="text-xs font-bold text-gray-800 hover:text-brand-600 flex items-center gap-2"
+                >
                   <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                  {user.name}
-                </span>
+                  <span>{user.name}</span>
+                  <span className="text-[10px] uppercase px-2 py-0.5 rounded-full bg-orange-100 text-brand-700 font-bold">
+                    {user.role}
+                  </span>
+                </Link>
                 <button
                   onClick={logout}
-                  className="p-2 rounded-full text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                  className="p-1.5 rounded-full text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
                   title="Logout"
                 >
                   <LogOut size={16} />

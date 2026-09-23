@@ -32,16 +32,16 @@ export const AuthProvider = ({ children }) => {
           if (data && data.data && data.data.user) {
             setUser(data.data.user);
           } else {
-            setUser(demoUser);
+            setUser(null);
           }
         } catch (error) {
           console.error('Error fetching user', error);
           localStorage.removeItem('token');
           delete axios.defaults.headers.common['Authorization'];
-          setUser(demoUser);
+          setUser(null);
         }
       } else {
-        setUser(demoUser);
+        setUser(null);
       }
       setLoading(false);
     };
