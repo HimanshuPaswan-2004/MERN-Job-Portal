@@ -38,7 +38,7 @@ const CandidateLayout = ({ children }) => {
   return (
   <div className="flex min-h-screen bg-[#fcf9f2]">
     {/* Sidebar */}
-    <aside className="w-64 bg-white border-r border-gray-100 flex-shrink-0 flex flex-col fixed h-full z-10 pt-20">
+    <aside className="w-64 bg-white border-r border-gray-200/80 flex-shrink-0 flex flex-col fixed top-20 bottom-0 left-0 z-30 shadow-xs">
       <div className="p-4 flex-grow overflow-y-auto">
         <SidebarItem icon={<HomeIcon size={20}/>} label="Dashboard" to="/candidate/dashboard" isActive={isActive('/candidate/dashboard') || isActive('/candidates/dashboard')} />
         <SidebarItem icon={<Search size={20}/>} label="Browse Jobs" to="/jobs" isActive={isActive('/jobs')} />
@@ -51,13 +51,13 @@ const CandidateLayout = ({ children }) => {
            <div className="w-10 h-10 bg-brand-100 text-brand-600 flex items-center justify-center rounded-full mx-auto mb-3"><Briefcase size={20}/></div>
            <h4 className="font-bold text-gray-900 text-sm mb-1">Get noticed by top companies</h4>
            <p className="text-xs text-gray-500 mb-3">Complete your profile and increase your chances of getting hired.</p>
-           <Link to="/candidate/profile/edit" className="block w-full bg-brand-600 text-white font-bold text-xs py-2 rounded-lg">Complete Profile &rarr;</Link>
+           <Link to="/candidate/profile/edit" className="block w-full bg-brand-600 text-white font-bold text-xs py-2 rounded-lg hover:bg-brand-700 transition-colors">Complete Profile &rarr;</Link>
         </div>
       </div>
-      <div className="p-4 border-t border-gray-100">
+      <div className="p-4 border-t border-gray-100 bg-white">
         <button
           onClick={logout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 font-medium hover:bg-red-50 hover:text-red-600 transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 font-medium hover:bg-red-50 hover:text-red-600 transition-colors cursor-pointer"
         >
           <LogOut size={20}/>
           <span>Logout</span>
@@ -65,10 +65,24 @@ const CandidateLayout = ({ children }) => {
       </div>
     </aside>
     {/* Main Content Area */}
-    <main className="flex-1 ml-64 p-6 pt-24 overflow-x-hidden">
-      <div className="max-w-7xl mx-auto">
+    <main className="flex-1 ml-64 p-6 pt-24 overflow-x-hidden flex flex-col justify-between min-h-[calc(100vh-80px)]">
+      <div className="max-w-7xl mx-auto w-full flex-grow">
         {children}
       </div>
+
+      {/* Clean Candidate Layout Footer */}
+      <footer className="mt-12 pt-6 pb-2 border-t border-gray-200/80 text-center text-xs text-gray-500">
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p>&copy; {new Date().getFullYear()} JobPortal Network. All rights reserved.</p>
+          <div className="flex items-center gap-4 text-gray-500 font-medium">
+            <Link to="/jobs" className="hover:text-brand-600 transition-colors">Browse Jobs</Link>
+            <span>&bull;</span>
+            <Link to="/candidate/profile" className="hover:text-brand-600 transition-colors">My Profile</Link>
+            <span>&bull;</span>
+            <Link to="/candidate/applications" className="hover:text-brand-600 transition-colors">Applications</Link>
+          </div>
+        </div>
+      </footer>
     </main>
   </div>
   );
@@ -84,6 +98,7 @@ const AppContent = () => {
   const location = useLocation();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
   const isRecruiterPage = location.pathname.startsWith('/recruiter');
+  const isCandidatePage = location.pathname.startsWith('/candidate') || location.pathname.startsWith('/candidates');
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -124,7 +139,7 @@ const AppContent = () => {
         </Routes>
       </main>
 
-      {!isAuthPage && !isRecruiterPage && <Footer />}
+      {!isAuthPage && !isRecruiterPage && !isCandidatePage && <Footer />}
     </div>
   );
 };

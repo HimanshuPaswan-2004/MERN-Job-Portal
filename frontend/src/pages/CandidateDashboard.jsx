@@ -314,8 +314,8 @@ const CandidateDashboard = () => {
             ))}
           </ul>
           
-          <div className="absolute right-[-10%] bottom-0 transform -rotate-12 opacity-80 z-0 text-right pr-6 pb-2">
-            <p className="font-caveat text-xl text-gray-800 font-bold leading-tight">Small<br/>Steps<br/><span className="text-brand-600 text-2xl">Big<br/>Opportunities</span></p>
+          <div className="absolute right-3 bottom-3 transform -rotate-12 opacity-70 z-0 text-right pointer-events-none select-none">
+            <p className="font-caveat text-lg text-gray-800 font-bold leading-tight">Small<br/>Steps<br/><span className="text-brand-600 text-xl">Big<br/>Opportunities</span></p>
           </div>
         </div>
 
