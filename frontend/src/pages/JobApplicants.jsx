@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useParams, useSearchParams } from 'react-router-dom';
+import { Link, useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
   Users,
@@ -42,6 +42,7 @@ import RecruiterLayout from '../components/RecruiterLayout';
 const JobApplicants = () => {
   const { jobId } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const queryJobId = jobId || searchParams.get('jobId') || 'all';
 
   // State definitions
@@ -864,7 +865,7 @@ const JobApplicants = () => {
                                   <Eye className="w-4 h-4" />
                                 </button>
                                 <button
-                                  onClick={() => showToast(`Opening candidate chat message dialog...`)}
+                                  onClick={() => navigate(`/recruiter/messages?candidateName=${encodeURIComponent(item.applicant?.name || item.name || 'Candidate')}&jobTitle=${encodeURIComponent(item.jobTitle || 'Applicant')}`)}
                                   className="p-2 text-gray-600 hover:text-brand-600 hover:bg-orange-50 rounded-xl transition-colors cursor-pointer"
                                   title="Send Message"
                                 >
@@ -1160,7 +1161,7 @@ const JobApplicants = () => {
                 </button>
 
                 <button
-                  onClick={() => showToast('Preparing candidate email broadcast...')}
+                  onClick={() => navigate('/recruiter/messages')}
                   className="w-full p-3 bg-gray-50 hover:bg-gray-100 rounded-2xl flex items-center gap-3 transition-colors cursor-pointer text-left"
                 >
                   <Mail className="w-4 h-4 text-brand-600 shrink-0" />

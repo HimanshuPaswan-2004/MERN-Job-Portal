@@ -10,6 +10,7 @@ import companyRoutes from './src/routes/companyRoutes.js';
 import jobRoutes from './src/routes/jobRoutes.js';
 import applicationRoutes from './src/routes/applicationRoutes.js';
 import uploadRoutes from './src/routes/uploadRoutes.js';
+import messageRoutes from './src/routes/messageRoutes.js';
 import path from 'path';
 
 dotenv.config();
@@ -28,6 +29,7 @@ app.use('/api/companies', companyRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/messages', messageRoutes);
 
 const __dirname = path.resolve();
 app.use('/uploads', express.static(path.join(__dirname, '/uploads')));

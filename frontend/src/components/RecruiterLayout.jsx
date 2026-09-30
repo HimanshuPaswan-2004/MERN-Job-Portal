@@ -35,7 +35,7 @@ const RecruiterLayout = ({ children }) => {
     { name: 'My Jobs', path: '/recruiter/jobs', icon: FileText },
     { name: 'Post a Job', path: '/recruiter/jobs/new', icon: PlusCircle },
     { name: 'Applicants', path: '/recruiter/applicants', icon: Users },
-    { name: 'Messages', path: '#', icon: MessageSquare },
+    { name: 'Messages', path: '/recruiter/messages', icon: MessageSquare },
     { name: 'Profile', path: '/candidate/profile', icon: User },
     { name: 'Settings', path: '#', icon: Settings },
   ];
