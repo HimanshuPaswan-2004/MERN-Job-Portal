@@ -865,7 +865,7 @@ const JobApplicants = () => {
                                   <Eye className="w-4 h-4" />
                                 </button>
                                 <button
-                                  onClick={() => navigate(`/recruiter/messages?candidateName=${encodeURIComponent(item.applicant?.name || item.name || 'Candidate')}&jobTitle=${encodeURIComponent(item.jobTitle || 'Applicant')}`)}
+                                  onClick={() => navigate(`/recruiter/messages?candidateId=${item.applicant?._id || ''}&candidateName=${encodeURIComponent(item.applicant?.name || item.name || 'Candidate')}&jobTitle=${encodeURIComponent(item.jobTitle || 'Applicant')}&jobId=${item.job?._id || ''}`)}
                                   className="p-2 text-gray-600 hover:text-brand-600 hover:bg-orange-50 rounded-xl transition-colors cursor-pointer"
                                   title="Send Message"
                                 >

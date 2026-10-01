@@ -522,6 +522,13 @@ const MyApplications = () => {
                       >
                         View Job <ChevronRight size={13} />
                       </Link>
+                      <Link
+                        to={`/candidate/messages?partnerName=${encodeURIComponent(app.job?.company || 'Employer')}&jobTitle=${encodeURIComponent(app.job?.title || 'Job')}&partnerId=${app.job?.createdBy || ''}&jobId=${app.job?._id || ''}`}
+                        className="text-gray-700 hover:text-[#f9571c] hover:bg-orange-50 border border-gray-200 font-bold py-1.5 px-3.5 rounded-xl transition-colors flex items-center gap-1.5"
+                        title="Message Employer"
+                      >
+                        <MessageSquare size={13} className="text-[#f9571c]" /> Message
+                      </Link>
                       <button
                         onClick={() => setSelectedAppForWithdraw(app)}
                         className="text-gray-400 hover:text-rose-600 p-1.5 hover:bg-rose-50 rounded-xl transition-colors"

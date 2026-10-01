@@ -80,8 +80,10 @@ export const getConversations = async (req, res) => {
     const conversationMap = new Map();
 
     for (const msg of messages) {
+      if (!msg.sender || !msg.receiver) continue;
       const isSender = msg.sender._id.toString() === userId.toString();
       const partner = isSender ? msg.receiver : msg.sender;
+      if (!partner) continue;
       const partnerId = partner._id.toString();
 
       if (!conversationMap.has(partnerId)) {

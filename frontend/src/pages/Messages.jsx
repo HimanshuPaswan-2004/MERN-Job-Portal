@@ -24,12 +24,21 @@ import {
   Sparkles,
   ChevronRight,
   Filter,
-  X
+  X,
+  ShieldCheck,
+  ArrowLeft,
+  Trash2,
+  Mic,
+  MicOff,
+  VideoOff,
+  PhoneOff,
+  Download,
+  Building2
 } from 'lucide-react';
 
 const API_BASE_URL = 'http://localhost:8000/api';
 
-// Initial fallback mock conversation data to ensure immediate rich experience
+// Fallback initial conversations to guarantee a rich demo experience out of the box
 const INITIAL_CONVERSATIONS = [
   {
     id: 'conv_1',
@@ -185,59 +194,86 @@ const Messages = () => {
   const { user } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  
+
+  // State management
   const [conversations, setConversations] = useState(() => {
     const saved = localStorage.getItem('jobportal_conversations');
     return saved ? JSON.parse(saved) : INITIAL_CONVERSATIONS;
   });
-  
+
   const [activeConvId, setActiveConvId] = useState(() => {
     return conversations.length > 0 ? conversations[0].id : null;
   });
 
+  const [activeMessages, setActiveMessages] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [inputText, setInputText] = useState('');
   const [filterType, setFilterType] = useState('all'); // 'all', 'unread', 'recruiters', 'candidates'
-  const [showDetailDrawer, setShowDetailDrawer] = useState(true);
+  const [showDetailDrawer, setShowDetailDrawer] = useState(false);
+  const [showMobileChat, setShowMobileChat] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
-  const messagesEndRef = useRef(null);
+  const [attachedFile, setAttachedFile] = useState(null);
 
-  // Sync state to local storage for persistence across reloads
+  // Call simulation modal state
+  const [activeCall, setActiveCall] = useState(null); // null or { type: 'audio'|'video', partnerName, partnerAvatar }
+  const [callDuration, setCallDuration] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
+  const [isVideoOff, setIsVideoOff] = useState(false);
+
+  const messagesEndRef = useRef(null);
+  const fileInputRef = useRef(null);
+
+  // Sync conversations to localStorage
   useEffect(() => {
     localStorage.setItem('jobportal_conversations', JSON.stringify(conversations));
   }, [conversations]);
 
-  // Handle incoming query params or navigation state (e.g. from JobApplicants or JobDetails)
+  // Call timer effect
+  useEffect(() => {
+    let timer;
+    if (activeCall) {
+      timer = setInterval(() => setCallDuration(prev => prev + 1), 1000);
+    } else {
+      setCallDuration(0);
+    }
+    return () => clearInterval(timer);
+  }, [activeCall]);
+
+  // Handle URL query parameters for starting/selecting conversations from other pages
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
-    const candidateName = queryParams.get('candidateName');
+    const candidateName = queryParams.get('candidateName') || queryParams.get('partnerName');
+    const partnerId = queryParams.get('candidateId') || queryParams.get('partnerId');
     const jobTitle = queryParams.get('jobTitle');
+    const jobId = queryParams.get('jobId');
 
-    if (candidateName) {
-      // Find or create conversation for this candidate
-      const existing = conversations.find(c => 
-        c.partner.name.toLowerCase().includes(candidateName.toLowerCase())
+    if (candidateName || partnerId) {
+      // Look for existing conversation by partner ID or partner Name
+      const existing = conversations.find(c =>
+        (partnerId && String(c.partner.id) === String(partnerId)) ||
+        (candidateName && c.partner.name.toLowerCase().includes(candidateName.toLowerCase()))
       );
 
       if (existing) {
         setActiveConvId(existing.id);
+        setShowMobileChat(true);
       } else {
         const newConv = {
-          id: `conv_${Date.now()}`,
+          id: partnerId ? `api_conv_${partnerId}` : `conv_${Date.now()}`,
           partner: {
-            id: `usr_${Date.now()}`,
-            name: candidateName,
-            email: `${candidateName.toLowerCase().replace(/\s+/g, '.')}@example.com`,
+            id: partnerId || `usr_${Date.now()}`,
+            name: candidateName || 'Recruiter/Candidate',
+            email: `${(candidateName || 'user').toLowerCase().replace(/\s+/g, '.')}@example.com`,
             role: user?.role === 'recruiter' ? 'candidate' : 'recruiter',
-            title: jobTitle ? `Applicant for ${jobTitle}` : 'Software Professional',
-            company: 'Candidate',
-            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(candidateName)}&background=f9571c&color=fff`,
+            title: jobTitle ? `Regarding ${jobTitle}` : 'Job Portal Member',
+            company: user?.role === 'recruiter' ? 'Applicant' : (jobTitle ? 'Hiring Manager' : 'JobPortal Network'),
+            avatar: `https://ui-avatars.com/api/?name=${encodeURIComponent(candidateName || 'User')}&background=f9571c&color=fff`,
             online: true
           },
           job: {
-            id: `job_${Date.now()}`,
+            id: jobId || `job_${Date.now()}`,
             title: jobTitle || 'General Inquiry',
-            company: user?.companyName || 'Our Company',
+            company: 'JobPortal Network',
             salary: 'Competitive',
             location: 'Remote'
           },
@@ -256,39 +292,41 @@ const Messages = () => {
         };
         setConversations(prev => [newConv, ...prev]);
         setActiveConvId(newConv.id);
+        setShowMobileChat(true);
       }
     }
   }, [location.search]);
 
-  // Fetch real messages from backend API if available
-  useEffect(() => {
-    const fetchApiConversations = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
+  // Fetch API conversations from backend if token exists
+  const fetchConversationsFromApi = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
 
-        const res = await axios.get(`${API_BASE_URL}/messages/conversations`, {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+      const res = await axios.get(`${API_BASE_URL}/messages/conversations`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
 
-        if (res.data?.success && res.data.conversations.length > 0) {
-          // Merge API conversations with UI format
-          const formatted = res.data.conversations.map((c, idx) => ({
-            id: `api_conv_${c.user._id}`,
+      if (res.data?.success && Array.isArray(res.data.conversations) && res.data.conversations.length > 0) {
+        const formatted = res.data.conversations.map(c => {
+          const partnerUser = c.user || {};
+          const lastMsg = c.lastMessage || {};
+          return {
+            id: `api_conv_${partnerUser._id}`,
             partner: {
-              id: c.user._id,
-              name: c.user.name,
-              email: c.user.email,
-              role: c.user.role,
-              title: c.user.tagline || `${c.user.role === 'recruiter' ? 'Hiring Manager' : 'Candidate'}`,
-              company: c.user.location || 'JobPortal Platform',
-              avatar: c.user.profilePhoto || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.user.name)}&background=f9571c&color=fff`,
+              id: partnerUser._id,
+              name: partnerUser.name || 'Unknown User',
+              email: partnerUser.email || '',
+              role: partnerUser.role || 'user',
+              title: partnerUser.tagline || (partnerUser.role === 'recruiter' ? 'Hiring Representative' : 'Job Seeker'),
+              company: partnerUser.location || 'JobPortal Platform',
+              avatar: partnerUser.profilePhoto || `https://ui-avatars.com/api/?name=${encodeURIComponent(partnerUser.name || 'User')}&background=f9571c&color=fff`,
               online: true
             },
-            job: c.lastMessage?.job ? {
-              id: c.lastMessage.job._id,
-              title: c.lastMessage.job.title,
-              company: c.lastMessage.job.company,
+            job: lastMsg.job ? {
+              id: lastMsg.job._id,
+              title: lastMsg.job.title,
+              company: lastMsg.job.company,
               salary: 'Negotiable',
               location: 'Remote'
             } : {
@@ -299,32 +337,101 @@ const Messages = () => {
             unreadCount: c.unreadCount || 0,
             messages: [
               {
-                id: c.lastMessage._id,
-                senderId: c.lastMessage.sender._id === user?._id ? 'candidate_me' : c.lastMessage.sender._id,
-                text: c.lastMessage.content,
-                timestamp: new Date(c.lastMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                id: lastMsg._id || `m_${Date.now()}`,
+                senderId: lastMsg.sender === user?._id || lastMsg.sender?._id === user?._id ? 'candidate_me' : (partnerUser._id || 'partner'),
+                text: lastMsg.content || 'Start a conversation...',
+                timestamp: lastMsg.createdAt ? new Date(lastMsg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Just now',
                 date: 'Today',
-                read: c.lastMessage.read
+                read: lastMsg.read || false,
+                attachment: lastMsg.attachment ? { name: lastMsg.attachment, size: 'Attached File' } : null
               }
             ]
-          }));
+          };
+        });
 
-          setConversations(formatted);
-          if (formatted.length > 0) setActiveConvId(formatted[0].id);
-        }
-      } catch (err) {
-        // Soft fallback to local state if backend API has no database messages
-        console.log('Using local client state for conversations UI');
+        // Merge with existing state preserving active conversation selection
+        setConversations(prev => {
+          const prevMap = new Map(prev.map(item => [item.id, item]));
+          formatted.forEach(item => prevMap.set(item.id, item));
+          return Array.from(prevMap.values());
+        });
       }
-    };
+    } catch (err) {
+      console.log('Backend API conversation sync offline, using local client storage');
+    }
+  };
 
-    fetchApiConversations();
+  // Fetch full message thread for active conversation
+  const fetchActiveMessagesFromApi = async (partnerId) => {
+    if (!partnerId || String(partnerId).startsWith('rec_') || String(partnerId).startsWith('usr_') || String(partnerId).startsWith('candidate_')) {
+      // Local mock conversation thread fallback
+      const currentLocal = conversations.find(c => c.id === activeConvId);
+      if (currentLocal) {
+        setActiveMessages(currentLocal.messages || []);
+      }
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const res = await axios.get(`${API_BASE_URL}/messages/${partnerId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (res.data?.success && Array.isArray(res.data.messages)) {
+        const formattedMsgs = res.data.messages.map(m => {
+          const isSenderMe = (m.sender?._id || m.sender) === user?._id;
+          return {
+            id: m._id,
+            senderId: isSenderMe ? 'candidate_me' : partnerId,
+            text: m.content,
+            timestamp: new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            date: new Date(m.createdAt).toLocaleDateString(),
+            read: m.read,
+            attachment: m.attachment ? { name: m.attachment, size: 'Document File' } : null
+          };
+        });
+        setActiveMessages(formattedMsgs);
+      }
+    } catch (err) {
+      const currentLocal = conversations.find(c => c.id === activeConvId);
+      if (currentLocal) {
+        setActiveMessages(currentLocal.messages || []);
+      }
+    }
+  };
+
+  // On mount and user change, load conversations
+  useEffect(() => {
+    fetchConversationsFromApi();
   }, [user]);
 
-  // Scroll message view to bottom when new messages arrive
+  // When active conversation changes, load messages and scroll
+  useEffect(() => {
+    const activeConv = conversations.find(c => c.id === activeConvId);
+    if (activeConv) {
+      fetchActiveMessagesFromApi(activeConv.partner?.id);
+    }
+  }, [activeConvId]);
+
+  // Real-time polling timer every 4 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchConversationsFromApi();
+      const activeConv = conversations.find(c => c.id === activeConvId);
+      if (activeConv && activeConv.partner?.id) {
+        fetchActiveMessagesFromApi(activeConv.partner.id);
+      }
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [activeConvId, conversations, user]);
+
+  // Scroll to bottom when messages update
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [activeConvId, conversations]);
+  }, [activeMessages, activeConvId]);
 
   const activeConv = conversations.find(c => c.id === activeConvId);
 
@@ -333,99 +440,138 @@ const Messages = () => {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setAttachedFile({
+        name: file.name,
+        size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`
+      });
+      showToastNotification(`File attached: ${file.name}`);
+    }
+  };
+
   const handleSendMessage = async (e) => {
     if (e) e.preventDefault();
-    if (!inputText.trim() || !activeConv) return;
+    if (!inputText.trim() && !attachedFile) return;
+    if (!activeConv) return;
 
     const newMsgText = inputText.trim();
+    const currentAttachment = attachedFile;
+
     setInputText('');
+    setAttachedFile(null);
 
     const newMsg = {
       id: `msg_${Date.now()}`,
       senderId: 'candidate_me',
-      text: newMsgText,
+      text: newMsgText || (currentAttachment ? `Attached file: ${currentAttachment.name}` : ''),
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       date: 'Today',
-      read: true
+      read: true,
+      attachment: currentAttachment
     };
 
-    // Update active conversation locally
+    // Optimistically update active messages state
+    setActiveMessages(prev => [...prev, newMsg]);
+
+    // Update conversation item in list
     setConversations(prev =>
       prev.map(c => {
         if (c.id === activeConvId) {
           return {
             ...c,
             unreadCount: 0,
-            messages: [...c.messages, newMsg]
+            messages: [...(c.messages || []), newMsg]
           };
         }
         return c;
       })
     );
 
-    // Try posting message to backend API asynchronously
+    // Post to backend API if target partner has real ID
     try {
       const token = localStorage.getItem('token');
-      if (token && activeConv.partner?.id && !activeConv.partner.id.startsWith('rec_')) {
+      const partnerId = activeConv.partner?.id;
+      if (token && partnerId && !String(partnerId).startsWith('rec_') && !String(partnerId).startsWith('usr_')) {
         await axios.post(
           `${API_BASE_URL}/messages`,
           {
-            receiverId: activeConv.partner.id,
-            content: newMsgText,
-            jobId: activeConv.job?.id
+            receiverId: partnerId,
+            content: newMsgText || (currentAttachment ? `Attached file: ${currentAttachment.name}` : ''),
+            jobId: activeConv.job?.id,
+            attachment: currentAttachment ? currentAttachment.name : null
           },
           { headers: { Authorization: `Bearer ${token}` } }
         );
+        fetchActiveMessagesFromApi(partnerId);
       }
     } catch (err) {
-      console.log('Saved message to local state');
+      console.log('Saved message to client state');
     }
 
-    // Auto-reply simulation for interactive experience if testing
-    setTimeout(() => {
-      const replyOptions = [
-        "Thanks for your message! I have logged this update in our recruitment dashboard.",
-        "Got it! Let me review this with the hiring team and I will get back to you shortly.",
-        "That sounds great! I've updated your application status accordingly.",
-        "Appreciate the prompt response! Let's stay in touch."
-      ];
-      const randomReply = replyOptions[Math.floor(Math.random() * replyOptions.length)];
+    // Auto-reply simulation for mock contacts or interactive testing
+    const partnerId = activeConv.partner?.id;
+    if (String(partnerId).startsWith('rec_') || String(partnerId).startsWith('usr_') || String(partnerId).startsWith('candidate_')) {
+      setTimeout(() => {
+        const replyOptions = [
+          "Thanks for your message! I have logged this update in our recruitment dashboard.",
+          "Got it! Let me review this with the hiring team and I will get back to you shortly.",
+          "That sounds great! I've updated your application status accordingly.",
+          "Appreciate the prompt response! Let's stay in touch.",
+          "Thank you for sharing. We are excited about moving to the next interview step!"
+        ];
+        const randomReply = replyOptions[Math.floor(Math.random() * replyOptions.length)];
 
-      const autoReply = {
-        id: `msg_reply_${Date.now()}`,
-        senderId: activeConv.partner.id,
-        text: randomReply,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        date: 'Today',
-        read: false
-      };
+        const autoReply = {
+          id: `msg_reply_${Date.now()}`,
+          senderId: activeConv.partner.id,
+          text: randomReply,
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          date: 'Today',
+          read: false
+        };
 
-      setConversations(prev =>
-        prev.map(c => {
-          if (c.id === activeConvId) {
-            return {
-              ...c,
-              messages: [...c.messages, autoReply]
-            };
-          }
-          return c;
-        })
-      );
-    }, 1800);
+        setActiveMessages(prev => [...prev, autoReply]);
+        setConversations(prev =>
+          prev.map(c => {
+            if (c.id === activeConvId) {
+              return {
+                ...c,
+                messages: [...(c.messages || []), autoReply]
+              };
+            }
+            return c;
+          })
+        );
+      }, 1500);
+    }
   };
 
-  const markConvAsRead = (id) => {
+  const selectConversation = (id) => {
     setActiveConvId(id);
+    setShowMobileChat(true);
     setConversations(prev =>
       prev.map(c => (c.id === id ? { ...c, unreadCount: 0 } : c))
     );
   };
 
+  const handleDeleteConversation = (id) => {
+    const updated = conversations.filter(c => c.id !== id);
+    setConversations(updated);
+    if (updated.length > 0) {
+      setActiveConvId(updated[0].id);
+    } else {
+      setActiveConvId(null);
+    }
+    showToastNotification('Conversation deleted');
+  };
+
   const filteredConversations = conversations.filter(c => {
     const matchesSearch =
       c.partner.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.job?.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.messages.some(m => m.text.toLowerCase().includes(searchQuery.toLowerCase()));
+      (c.job?.title && c.job.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (c.messages && c.messages.some(m => m.text.toLowerCase().includes(searchQuery.toLowerCase())));
 
     if (!matchesSearch) return false;
 
@@ -435,9 +581,15 @@ const Messages = () => {
     return true;
   });
 
+  const formatCallTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
   return (
-    <div className="h-[calc(100vh-100px)] min-h-[620px] bg-white rounded-3xl border border-gray-200/90 shadow-sm flex overflow-hidden">
-      {/* Toast notification overlay */}
+    <div className="h-[calc(100vh-100px)] min-h-[620px] bg-white rounded-3xl border border-gray-200/90 shadow-sm flex overflow-hidden relative">
+      {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 right-6 z-50 bg-gray-900 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-fade-in border border-gray-800">
           <Sparkles className="w-4 h-4 text-[#f9571c]" />
@@ -445,8 +597,95 @@ const Messages = () => {
         </div>
       )}
 
+      {/* Interactive Call Modal Simulation */}
+      {activeCall && (
+        <div className="fixed inset-0 z-50 bg-gray-950/80 backdrop-blur-md flex items-center justify-center p-4">
+          <div className="bg-gray-900 border border-gray-800 text-white w-full max-w-md rounded-3xl p-6 text-center space-y-6 shadow-2xl relative overflow-hidden">
+            {/* Ambient glows */}
+            <div className="absolute -top-24 -left-24 w-48 h-48 bg-[#f9571c]/20 rounded-full blur-3xl"></div>
+            <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-emerald-500/20 rounded-full blur-3xl"></div>
+
+            <div className="relative z-10 space-y-3">
+              <div className="relative inline-block">
+                <img
+                  src={activeCall.partnerAvatar}
+                  alt={activeCall.partnerName}
+                  className="w-24 h-24 rounded-full object-cover mx-auto border-4 border-[#f9571c]/40 ring-4 ring-[#f9571c]/10"
+                />
+                <span className="absolute bottom-1 right-1 w-4 h-4 bg-emerald-500 border-2 border-gray-900 rounded-full animate-ping"></span>
+              </div>
+              <h3 className="text-lg font-extrabold tracking-tight">{activeCall.partnerName}</h3>
+              <p className="text-xs text-orange-400 font-semibold uppercase tracking-wider">
+                {activeCall.type === 'video' ? 'Live Video Interview' : 'Recruitment Voice Screen'}
+              </p>
+              <div className="inline-block px-3 py-1 bg-gray-800/80 rounded-full text-xs font-mono text-emerald-400 font-bold border border-gray-700">
+                {formatCallTime(callDuration)}
+              </div>
+            </div>
+
+            {/* Video Call Preview Box if Video Call */}
+            {activeCall.type === 'video' && !isVideoOff && (
+              <div className="relative h-40 bg-gray-950 rounded-2xl border border-gray-800 flex items-center justify-center overflow-hidden">
+                <img
+                  src={activeCall.partnerAvatar}
+                  alt="Video Stream"
+                  className="w-full h-full object-cover opacity-80"
+                />
+                <div className="absolute bottom-2 left-2 bg-black/60 px-2.5 py-1 rounded-lg text-[10px] font-bold text-white">
+                  HD Stream Ready
+                </div>
+              </div>
+            )}
+
+            {/* Control Buttons Bar */}
+            <div className="flex items-center justify-center gap-4 relative z-10 pt-2">
+              <button
+                onClick={() => setIsMuted(!isMuted)}
+                className={`p-3.5 rounded-2xl transition-all cursor-pointer ${
+                  isMuted ? 'bg-red-500 text-white' : 'bg-gray-800 hover:bg-gray-700 text-gray-200'
+                }`}
+                title={isMuted ? 'Unmute' : 'Mute'}
+              >
+                {isMuted ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+              </button>
+
+              {activeCall.type === 'video' && (
+                <button
+                  onClick={() => setIsVideoOff(!isVideoOff)}
+                  className={`p-3.5 rounded-2xl transition-all cursor-pointer ${
+                    isVideoOff ? 'bg-red-500 text-white' : 'bg-gray-800 hover:bg-gray-700 text-gray-200'
+                  }`}
+                  title={isVideoOff ? 'Turn Camera On' : 'Turn Camera Off'}
+                >
+                  {isVideoOff ? <VideoOff className="w-5 h-5" /> : <Video className="w-5 h-5" />}
+                </button>
+              )}
+
+              <button
+                onClick={() => setActiveCall(null)}
+                className="p-4 bg-red-600 hover:bg-red-700 text-white rounded-2xl transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2"
+                title="End Call"
+              >
+                <PhoneOff className="w-5 h-5" />
+                <span className="text-xs font-bold">End Call</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Hidden File Input */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileChange}
+        className="hidden"
+      />
+
       {/* 1. LEFT SIDEBAR - CONVERSATION LIST */}
-      <div className="w-80 md:w-96 border-r border-gray-100 flex flex-col bg-gray-50/50 shrink-0">
+      <div className={`w-full md:w-80 lg:w-96 border-r border-gray-100 flex flex-col bg-gray-50/50 shrink-0 ${
+        showMobileChat ? 'hidden md:flex' : 'flex'
+      }`}>
         {/* Header & Search */}
         <div className="p-4 border-b border-gray-100 bg-white space-y-3">
           <div className="flex items-center justify-between">
@@ -508,12 +747,12 @@ const Messages = () => {
           ) : (
             filteredConversations.map(conv => {
               const isActive = conv.id === activeConvId;
-              const lastMsg = conv.messages[conv.messages.length - 1];
+              const lastMsg = conv.messages && conv.messages.length > 0 ? conv.messages[conv.messages.length - 1] : null;
 
               return (
                 <div
                   key={conv.id}
-                  onClick={() => markConvAsRead(conv.id)}
+                  onClick={() => selectConversation(conv.id)}
                   className={`p-3.5 flex items-start gap-3 cursor-pointer transition-all ${
                     isActive
                       ? 'bg-white border-l-4 border-l-[#f9571c] shadow-xs'
@@ -538,7 +777,7 @@ const Messages = () => {
                       <h4 className={`text-xs truncate ${conv.unreadCount > 0 ? 'font-black text-gray-900' : 'font-bold text-gray-800'}`}>
                         {conv.partner.name}
                       </h4>
-                      <span className="text-[10px] font-medium text-gray-400 shrink-0">
+                      <span className="text-[10px] font-medium text-gray-400 shrink-0 ml-1">
                         {lastMsg?.timestamp || ''}
                       </span>
                     </div>
@@ -549,7 +788,7 @@ const Messages = () => {
 
                     <div className="flex items-center justify-between">
                       <p className={`text-xs truncate ${conv.unreadCount > 0 ? 'font-bold text-gray-900' : 'text-gray-500'}`}>
-                        {lastMsg?.text || 'No messages yet'}
+                        {lastMsg?.text || 'Start conversation...'}
                       </p>
                       {conv.unreadCount > 0 && (
                         <span className="ml-2 w-4 h-4 rounded-full bg-[#f9571c] text-white text-[10px] font-bold flex items-center justify-center shrink-0">
@@ -567,10 +806,21 @@ const Messages = () => {
 
       {/* 2. MAIN CHAT AREA */}
       {activeConv ? (
-        <div className="flex-1 flex flex-col bg-white">
+        <div className={`flex-1 flex flex-col bg-white ${
+          !showMobileChat ? 'hidden md:flex' : 'flex'
+        }`}>
           {/* Active Chat Header */}
           <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
             <div className="flex items-center gap-3">
+              {/* Back button on mobile screens */}
+              <button
+                onClick={() => setShowMobileChat(false)}
+                className="md:hidden p-2 rounded-xl hover:bg-gray-100 text-gray-600 cursor-pointer"
+                title="Back to conversations"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+
               <div className="relative">
                 <img
                   src={activeConv.partner.avatar}
@@ -589,9 +839,9 @@ const Messages = () => {
                   </span>
                 </div>
                 <p className="text-xs font-medium text-gray-500 flex items-center gap-2">
-                  <span>{activeConv.partner.title}</span>
+                  <span className="truncate max-w-[180px]">{activeConv.partner.title}</span>
                   <span>&bull;</span>
-                  <span className="text-emerald-600 font-semibold flex items-center gap-1">
+                  <span className="text-emerald-600 font-semibold flex items-center gap-1 shrink-0">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active Now
                   </span>
                 </p>
@@ -599,18 +849,26 @@ const Messages = () => {
             </div>
 
             {/* Top Action Controls */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <button
-                onClick={() => showToastNotification(`Calling ${activeConv.partner.name}...`)}
+                onClick={() => setActiveCall({
+                  type: 'audio',
+                  partnerName: activeConv.partner.name,
+                  partnerAvatar: activeConv.partner.avatar
+                })}
                 className="p-2 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors cursor-pointer"
-                title="Audio Call"
+                title="Start Audio Call"
               >
                 <Phone className="w-4 h-4" />
               </button>
               <button
-                onClick={() => showToastNotification(`Starting video interview with ${activeConv.partner.name}...`)}
+                onClick={() => setActiveCall({
+                  type: 'video',
+                  partnerName: activeConv.partner.name,
+                  partnerAvatar: activeConv.partner.avatar
+                })}
                 className="p-2 rounded-xl text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors cursor-pointer"
-                title="Video Call"
+                title="Start Video Interview Call"
               >
                 <Video className="w-4 h-4" />
               </button>
@@ -619,24 +877,42 @@ const Messages = () => {
                 className={`p-2 rounded-xl transition-colors cursor-pointer ${
                   showDetailDrawer ? 'bg-orange-50 text-[#f9571c]' : 'text-gray-600 hover:bg-gray-100'
                 }`}
-                title="Job & Application Context"
+                title="Job & Context Info"
               >
                 <Info className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => handleDeleteConversation(activeConv.id)}
+                className="p-2 rounded-xl text-gray-400 hover:text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
+                title="Delete Conversation"
+              >
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
           </div>
 
           {/* Messages Stream Container */}
           <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-[#fcfbfa]/60">
-            {/* System Info Banner */}
+            {/* System Encryption Security Banner */}
             <div className="text-center my-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 text-[11px] font-semibold text-[#f9571c]">
-                <ShieldCheck className="w-3.5 h-3.5" /> End-to-end encrypted recruitment channel for {activeConv.job?.title}
+                <ShieldCheck className="w-3.5 h-3.5" /> Direct encrypted recruitment channel for {activeConv.job?.title || 'Job Opportunity'}
               </span>
             </div>
 
-            {activeConv.messages.map((msg, idx) => {
+            {activeMessages.map((msg, idx) => {
               const isMe = msg.senderId === 'candidate_me';
+              const isSystem = msg.senderId === 'system';
+
+              if (isSystem) {
+                return (
+                  <div key={msg.id || idx} className="text-center my-3">
+                    <span className="px-3 py-1 rounded-full bg-gray-100 text-[11px] font-medium text-gray-500">
+                      {msg.text}
+                    </span>
+                  </div>
+                );
+              }
 
               return (
                 <div
@@ -647,7 +923,7 @@ const Messages = () => {
                     <img
                       src={activeConv.partner.avatar}
                       alt="Avatar"
-                      className="w-7 h-7 rounded-full object-cover mb-1 border border-gray-200"
+                      className="w-7 h-7 rounded-full object-cover mb-1 border border-gray-200 shrink-0"
                     />
                   )}
 
@@ -671,10 +947,11 @@ const Messages = () => {
                             <span className="truncate text-[11px] font-bold">{msg.attachment.name}</span>
                           </div>
                           <button
+                            type="button"
                             onClick={() => showToastNotification(`Downloading ${msg.attachment.name}...`)}
-                            className="text-[10px] font-bold px-2 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-white shrink-0 cursor-pointer"
+                            className="text-[10px] font-bold px-2 py-1 rounded-lg bg-white/20 hover:bg-white/30 text-white shrink-0 cursor-pointer flex items-center gap-1"
                           >
-                            Download
+                            <Download className="w-3 h-3" /> Download
                           </button>
                         </div>
                       )}
@@ -707,13 +984,30 @@ const Messages = () => {
             ))}
           </div>
 
+          {/* Attached File Preview Bar */}
+          {attachedFile && (
+            <div className="px-4 py-2 bg-orange-50 border-t border-orange-100 flex items-center justify-between text-xs text-[#f9571c] font-semibold">
+              <div className="flex items-center gap-2 truncate">
+                <FileText className="w-4 h-4" />
+                <span className="truncate">Attached: {attachedFile.name} ({attachedFile.size})</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setAttachedFile(null)}
+                className="p-1 hover:bg-orange-100 rounded-lg cursor-pointer text-gray-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
           {/* Message Composer Footer Input */}
           <form onSubmit={handleSendMessage} className="p-4 bg-white border-t border-gray-100 flex items-center gap-3">
             <button
               type="button"
-              onClick={() => showToastNotification('File upload attachment ready!')}
+              onClick={() => fileInputRef.current?.click()}
               className="p-2 text-gray-400 hover:text-[#f9571c] hover:bg-orange-50 rounded-xl transition-colors cursor-pointer"
-              title="Attach File / Resume"
+              title="Attach Document / Resume"
             >
               <Paperclip className="w-5 h-5" />
             </button>
@@ -737,7 +1031,7 @@ const Messages = () => {
 
             <button
               type="submit"
-              disabled={!inputText.trim()}
+              disabled={!inputText.trim() && !attachedFile}
               className="p-3 bg-[#f9571c] hover:bg-[#e0480e] disabled:opacity-40 text-white rounded-2xl transition-all shadow-md cursor-pointer flex items-center justify-center shrink-0"
             >
               <Send className="w-4 h-4 stroke-[2.5]" />
@@ -746,7 +1040,7 @@ const Messages = () => {
         </div>
       ) : (
         <div className="flex-1 flex flex-col items-center justify-center p-8 bg-gray-50 text-center space-y-4">
-          <div className="w-16 h-16 rounded-3xl bg-orange-100 text-[#f9571c] flex items-center justify-center">
+          <div className="w-16 h-16 rounded-3xl bg-orange-100 text-[#f9571c] flex items-center justify-center mx-auto">
             <MessageSquare className="w-8 h-8" />
           </div>
           <h3 className="text-lg font-bold text-gray-900">Select a conversation</h3>
@@ -758,7 +1052,7 @@ const Messages = () => {
 
       {/* 3. RIGHT DETAILS DRAWER */}
       {activeConv && showDetailDrawer && (
-        <div className="w-72 border-l border-gray-100 bg-white p-5 flex flex-col justify-between shrink-0 overflow-y-auto space-y-6">
+        <div className="w-full lg:w-72 border-l border-gray-100 bg-white p-5 flex flex-col justify-between shrink-0 overflow-y-auto space-y-6">
           <div className="space-y-6">
             {/* Header / Close */}
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
@@ -790,7 +1084,7 @@ const Messages = () => {
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold uppercase text-gray-400">Application</span>
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#f9571c] text-white">
-                  {activeConv.applicationStatus}
+                  {activeConv.applicationStatus || 'Active'}
                 </span>
               </div>
 
@@ -826,7 +1120,7 @@ const Messages = () => {
           </div>
 
           <div className="p-3 bg-gray-50 rounded-xl text-center">
-            <p className="text-[10px] text-gray-400 font-medium">JobPortal Messaging v1.0</p>
+            <p className="text-[10px] text-gray-400 font-medium">JobPortal Messaging v2.0</p>
           </div>
         </div>
       )}
