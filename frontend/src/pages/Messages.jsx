@@ -588,7 +588,7 @@ const Messages = () => {
   };
 
   return (
-    <div className="h-[calc(100vh-100px)] min-h-[620px] bg-white rounded-3xl border border-gray-200/90 shadow-sm flex overflow-hidden relative">
+    <div className="w-full h-[calc(100vh-120px)] min-h-[600px] max-h-[850px] bg-white rounded-3xl border border-gray-200/90 shadow-sm flex overflow-hidden relative">
       {/* Toast Notification */}
       {toastMessage && (
         <div className="fixed top-20 right-6 z-50 bg-gray-900 text-white px-5 py-3 rounded-2xl shadow-xl flex items-center gap-3 animate-fade-in border border-gray-800">
@@ -683,7 +683,7 @@ const Messages = () => {
       />
 
       {/* 1. LEFT SIDEBAR - CONVERSATION LIST */}
-      <div className={`w-full md:w-80 lg:w-96 border-r border-gray-100 flex flex-col bg-gray-50/50 shrink-0 ${
+      <div className={`w-full md:w-72 lg:w-80 border-r border-gray-100 flex flex-col bg-gray-50/50 shrink-0 ${
         showMobileChat ? 'hidden md:flex' : 'flex'
       }`}>
         {/* Header & Search */}
@@ -806,11 +806,11 @@ const Messages = () => {
 
       {/* 2. MAIN CHAT AREA */}
       {activeConv ? (
-        <div className={`flex-1 flex flex-col bg-white ${
+        <div className={`flex-1 min-w-0 flex flex-col bg-white ${
           !showMobileChat ? 'hidden md:flex' : 'flex'
         }`}>
           {/* Active Chat Header */}
-          <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
+          <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white shrink-0">
             <div className="flex items-center gap-3">
               {/* Back button on mobile screens */}
               <button
@@ -892,7 +892,7 @@ const Messages = () => {
           </div>
 
           {/* Messages Stream Container */}
-          <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-[#fcfbfa]/60">
+          <div className="flex-1 p-5 overflow-y-auto space-y-4 bg-[#fcfbfa]">
             {/* System Encryption Security Banner */}
             <div className="text-center my-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-50 border border-orange-100 text-[11px] font-semibold text-[#f9571c]">
@@ -969,7 +969,7 @@ const Messages = () => {
           </div>
 
           {/* Quick Reply Prompts */}
-          <div className="px-5 py-2 bg-white border-t border-gray-100 flex items-center gap-2 overflow-x-auto no-scrollbar">
+          <div className="px-5 py-2 bg-white border-t border-gray-100 flex items-center gap-2 overflow-x-auto no-scrollbar w-full min-w-0 shrink-0">
             <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider shrink-0 flex items-center gap-1">
               <Sparkles className="w-3 h-3 text-[#f9571c]" /> Quick Replies:
             </span>
@@ -986,7 +986,7 @@ const Messages = () => {
 
           {/* Attached File Preview Bar */}
           {attachedFile && (
-            <div className="px-4 py-2 bg-orange-50 border-t border-orange-100 flex items-center justify-between text-xs text-[#f9571c] font-semibold">
+            <div className="px-4 py-2 bg-orange-50 border-t border-orange-100 flex items-center justify-between text-xs text-[#f9571c] font-semibold shrink-0">
               <div className="flex items-center gap-2 truncate">
                 <FileText className="w-4 h-4" />
                 <span className="truncate">Attached: {attachedFile.name} ({attachedFile.size})</span>
@@ -1002,7 +1002,7 @@ const Messages = () => {
           )}
 
           {/* Message Composer Footer Input */}
-          <form onSubmit={handleSendMessage} className="p-4 bg-white border-t border-gray-100 flex items-center gap-3">
+          <form onSubmit={handleSendMessage} className="p-4 bg-white border-t border-gray-100 flex items-center gap-3 shrink-0">
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
@@ -1052,7 +1052,7 @@ const Messages = () => {
 
       {/* 3. RIGHT DETAILS DRAWER */}
       {activeConv && showDetailDrawer && (
-        <div className="w-full lg:w-72 border-l border-gray-100 bg-white p-5 flex flex-col justify-between shrink-0 overflow-y-auto space-y-6">
+        <div className="w-full md:w-64 lg:w-72 border-l border-gray-100 bg-white p-5 flex flex-col justify-between shrink-0 overflow-y-auto space-y-6">
           <div className="space-y-6">
             {/* Header / Close */}
             <div className="flex items-center justify-between border-b border-gray-100 pb-3">
