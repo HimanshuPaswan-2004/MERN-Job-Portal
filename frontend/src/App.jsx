@@ -18,11 +18,10 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import MyApplications from './pages/MyApplications';
 import JobApplicants from './pages/JobApplicants';
-import Messages from './pages/Messages';
 import RecruiterLayout from './components/RecruiterLayout';
 
 // Dummy components for now
-import { Home as HomeIcon, Search, FileText, User as UserIcon, FileCode, Bookmark, Bell, Settings, LogOut, Briefcase, MessageSquare } from 'lucide-react';
+import { Home as HomeIcon, Search, FileText, User as UserIcon, FileCode, Bookmark, Bell, Settings, LogOut, Briefcase } from 'lucide-react';
 
 const SidebarItem = ({ icon, label, to, isActive }) => (
   <Link to={to || "#"} className={`flex items-center gap-3 px-4 py-3 rounded-xl mb-1 transition-colors ${isActive ? 'bg-orange-50 text-brand-600 font-bold' : 'text-gray-600 font-medium hover:bg-gray-50 hover:text-brand-600'}`}>
@@ -44,7 +43,6 @@ const CandidateLayout = ({ children }) => {
         <SidebarItem icon={<HomeIcon size={20}/>} label="Dashboard" to="/candidate/dashboard" isActive={isActive('/candidate/dashboard') || isActive('/candidates/dashboard')} />
         <SidebarItem icon={<Search size={20}/>} label="Browse Jobs" to="/jobs" isActive={isActive('/jobs')} />
         <SidebarItem icon={<FileText size={20}/>} label="My Applications" to="/candidate/applications" isActive={isActive('/candidate/applications')} />
-        <SidebarItem icon={<MessageSquare size={20}/>} label="Messages" to="/candidate/messages" isActive={isActive('/candidate/messages')} />
         <SidebarItem icon={<UserIcon size={20}/>} label="My Profile" to="/candidate/profile" isActive={isActive('/candidate/profile')} />
         <SidebarItem icon={<FileCode size={20}/>} label="Resume" to="/candidate/profile" />
         <SidebarItem icon={<Bookmark size={20}/>} label="Saved Jobs" to="/jobs" />
@@ -124,7 +122,6 @@ const AppContent = () => {
             <Route path="/candidate/profile" element={<CandidateLayout><CandidateProfile /></CandidateLayout>} />
             <Route path="/candidate/profile/edit" element={<CandidateLayout><EditProfile /></CandidateLayout>} />
             <Route path="/candidate/applications" element={<CandidateLayout><MyApplications /></CandidateLayout>} />
-            <Route path="/candidate/messages" element={<CandidateLayout><Messages /></CandidateLayout>} />
           </Route>
           
           {/* Recruiter Protected Routes */}
@@ -138,7 +135,6 @@ const AppContent = () => {
             <Route path="/recruiter/jobs/:id/edit" element={<RecruiterLayout><JobForm /></RecruiterLayout>} />
             <Route path="/recruiter/applicants" element={<JobApplicants />} />
             <Route path="/recruiter/jobs/:jobId/applicants" element={<JobApplicants />} />
-            <Route path="/recruiter/messages" element={<RecruiterLayout><Messages /></RecruiterLayout>} />
           </Route>
         </Routes>
       </main>

@@ -4,3 +4,4 @@ backend/.env
 dist/
 build/
 .DS_Store
+backend/uploads/

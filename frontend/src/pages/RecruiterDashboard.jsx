@@ -8,7 +8,6 @@ import {
   Briefcase,
   PlusCircle,
   Users,
-  MessageSquare,
   User,
   Settings,
   LogOut,
@@ -257,7 +256,6 @@ const RecruiterDashboard = () => {
               { name: 'My Jobs', icon: Briefcase, path: '/recruiter/jobs' },
               { name: 'Post a Job', icon: PlusCircle, path: '/recruiter/jobs/new' },
               { name: 'Applicants', icon: Users, path: '/recruiter/applicants' },
-              { name: 'Messages', icon: MessageSquare, path: '/recruiter/messages' },
               { name: 'Profile', icon: User, path: '/candidate/profile' },
               { name: 'Settings', icon: Settings, path: '#' },
             ].map((item) => {

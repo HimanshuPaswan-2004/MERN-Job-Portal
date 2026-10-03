@@ -9,7 +9,6 @@ import {
   Search,
   Download,
   Eye,
-  MessageSquare,
   MoreVertical,
   ChevronRight,
   MapPin,
@@ -864,13 +863,6 @@ const JobApplicants = () => {
                                 >
                                   <Eye className="w-4 h-4" />
                                 </button>
-                                <button
-                                  onClick={() => navigate(`/recruiter/messages?candidateId=${item.applicant?._id || ''}&candidateName=${encodeURIComponent(item.applicant?.name || item.name || 'Candidate')}&jobTitle=${encodeURIComponent(item.jobTitle || 'Applicant')}&jobId=${item.job?._id || ''}`)}
-                                  className="p-2 text-gray-600 hover:text-brand-600 hover:bg-orange-50 rounded-xl transition-colors cursor-pointer"
-                                  title="Send Message"
-                                >
-                                  <MessageSquare className="w-4 h-4" />
-                                </button>
 
                                 {/* More Popup */}
                                 <div className="relative">
@@ -1160,13 +1152,6 @@ const JobApplicants = () => {
                   <span>Schedule Bulk Interviews</span>
                 </button>
 
-                <button
-                  onClick={() => navigate('/recruiter/messages')}
-                  className="w-full p-3 bg-gray-50 hover:bg-gray-100 rounded-2xl flex items-center gap-3 transition-colors cursor-pointer text-left"
-                >
-                  <Mail className="w-4 h-4 text-brand-600 shrink-0" />
-                  <span>Send Message to Selected</span>
-                </button>
 
                 <button
                   onClick={() => showToast('Downloading resume attachments package...')}

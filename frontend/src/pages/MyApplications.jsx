@@ -21,7 +21,6 @@ import {
   ArrowRight,
   X,
   ExternalLink,
-  MessageSquare,
   HelpCircle
 } from 'lucide-react';
 import axios from 'axios';
@@ -521,13 +520,6 @@ const MyApplications = () => {
                         className="text-brand-600 hover:bg-brand-50 border border-brand-200 font-bold py-1.5 px-3.5 rounded-xl transition-colors flex items-center gap-1"
                       >
                         View Job <ChevronRight size={13} />
-                      </Link>
-                      <Link
-                        to={`/candidate/messages?partnerName=${encodeURIComponent(app.job?.company || 'Employer')}&jobTitle=${encodeURIComponent(app.job?.title || 'Job')}&partnerId=${app.job?.createdBy || ''}&jobId=${app.job?._id || ''}`}
-                        className="text-gray-700 hover:text-[#f9571c] hover:bg-orange-50 border border-gray-200 font-bold py-1.5 px-3.5 rounded-xl transition-colors flex items-center gap-1.5"
-                        title="Message Employer"
-                      >
-                        <MessageSquare size={13} className="text-[#f9571c]" /> Message
                       </Link>
                       <button
                         onClick={() => setSelectedAppForWithdraw(app)}
