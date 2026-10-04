@@ -36,7 +36,7 @@ import {
   RefreshCw,
   Share2
 } from 'lucide-react';
-import RecruiterLayout from '../components/RecruiterLayout';
+import RecruiterLayout from '../../components/layout/RecruiterLayout';
 
 const JobApplicants = () => {
   const { jobId } = useParams();

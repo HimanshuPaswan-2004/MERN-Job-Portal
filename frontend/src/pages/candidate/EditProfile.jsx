@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { 
   User, Briefcase, GraduationCap, Link as LinkIcon, Settings,
   Camera, CheckCircle2, Circle, Lightbulb, Eye, BarChart2,

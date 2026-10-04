@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { 
   FileText, Clock, Users, Trophy, MapPin, Briefcase, IndianRupee,
   CheckCircle2, Circle, ArrowRight, Flame, Bookmark

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { 
   MapPin, Briefcase, BarChart, IndianRupee, Bookmark, Share2, 
   Users, Building, ChevronRight, Home, ExternalLink, ArrowRight, Clock, 

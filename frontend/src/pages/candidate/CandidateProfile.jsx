@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 import { 
   MapPin, Phone, Mail, Link as LinkIcon, Camera, CheckCircle2, Circle, 
   FileText, Download, Upload, Trash2, Edit2, Plus, Briefcase, GraduationCap, Settings,
