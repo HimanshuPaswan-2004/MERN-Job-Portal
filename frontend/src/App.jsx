@@ -96,9 +96,10 @@ const MainLayout = ({ children }) => (
 
 const AppContent = () => {
   const location = useLocation();
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/signup';
-  const isRecruiterPage = location.pathname.startsWith('/recruiter');
-  const isCandidatePage = location.pathname.startsWith('/candidate') || location.pathname.startsWith('/candidates');
+  const pathname = location.pathname.toLowerCase();
+  const isAuthPage = pathname.startsWith('/login') || pathname.startsWith('/signup') || pathname.startsWith('/register');
+  const isRecruiterPage = pathname.startsWith('/recruiter');
+  const isCandidatePage = pathname.startsWith('/candidate') || pathname.startsWith('/candidates');
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
