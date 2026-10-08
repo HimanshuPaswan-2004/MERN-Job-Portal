@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 
 const EditProfile = () => {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('Personal Info');
   const [loading, setLoading] = useState(false);
@@ -114,6 +114,9 @@ const EditProfile = () => {
     try {
       const res = await axios.put('/api/auth/me', formData);
       if (res.data.success) {
+        if (res.data.data && res.data.data.user) {
+          setUser(res.data.data.user);
+        }
         setSuccess('Profile updated successfully!');
         setTimeout(() => { setSuccess(''); navigate('/candidate/profile'); }, 1500);
       }

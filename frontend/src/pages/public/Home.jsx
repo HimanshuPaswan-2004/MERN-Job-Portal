@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import axios from 'axios';
 import { 
   Search, MapPin, Briefcase, FileText, Bell, TrendingUp, Code, Database, 
   Palette, LayoutDashboard, Megaphone, Users, ArrowRight, CheckCircle2, 
@@ -24,13 +25,12 @@ const HeroSection = () => {
   const [stats, setStats] = useState({ jobs: '50K+', companies: '10K+', hires: '1M+' });
 
   useEffect(() => {
-    fetch('http://localhost:8000/api/jobs/stats')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && data.data) {
+    axios.get('/api/jobs/stats')
+      .then((res) => {
+        if (res.data.success && res.data.data) {
           setStats({
-            jobs: data.data.totalJobs > 0 ? `${data.data.totalJobs}+` : '50K+',
-            companies: data.data.totalCompanies > 0 ? `${data.data.totalCompanies}+` : '10K+',
+            jobs: res.data.data.totalJobs > 0 ? `${res.data.data.totalJobs}+` : '50K+',
+            companies: res.data.data.totalCompanies > 0 ? `${res.data.data.totalCompanies}+` : '10K+',
             hires: '1M+'
           });
         }
@@ -257,48 +257,32 @@ const TrustedBySection = () => {
 
 // --- Featured Jobs Showcase ---
 const FeaturedJobsSection = () => {
-  const showcaseJobs = [
-    {
-      title: 'Senior Frontend Engineer',
-      company: 'TechCorp Solutions',
-      location: 'San Francisco, CA / Remote',
-      type: 'Full-time',
-      salary: '$130,000 - $160,000',
-      category: 'Software Development',
-      posted: '2 hours ago',
-      badge: 'Urgent Hire'
-    },
-    {
-      title: 'AI & Data Scientist',
-      company: 'DataMind Systems',
-      location: 'New York, NY / Hybrid',
-      type: 'Full-time',
-      salary: '$145,000 - $185,000',
-      category: 'Data Science',
-      posted: '5 hours ago',
-      badge: 'Featured'
-    },
-    {
-      title: 'Senior UX/UI Designer',
-      company: 'CreativePulse Studio',
-      location: 'Austin, TX / Remote',
-      type: 'Full-time',
-      salary: '$110,000 - $140,000',
-      category: 'Design & UX',
-      posted: '1 day ago',
-      badge: 'Remote'
-    },
-    {
-      title: 'Lead Product Manager',
-      company: 'NextGen Scale',
-      location: 'Seattle, WA',
-      type: 'Full-time',
-      salary: '$150,000 - $190,000',
-      category: 'Product Management',
-      posted: 'Just now',
-      badge: 'Hot Job'
-    }
-  ];
+  const [featuredJobs, setFeaturedJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchFeatured = async () => {
+      try {
+        const res = await axios.get('/api/jobs?limit=4');
+        if (res.data.success && res.data.data.jobs) {
+          setFeaturedJobs(res.data.data.jobs);
+        }
+      } catch (err) {
+        console.error('Error fetching featured jobs:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchFeatured();
+  }, []);
+
+  const formatSalary = (job) => {
+    if (job.salaryText) return job.salaryText;
+    if (!job.salary?.min && !job.salary?.max) return 'Competitive';
+    if (!job.salary?.min) return `Up to ₹${job.salary.max/100000} LPA`;
+    if (!job.salary?.max) return `₹${job.salary.min/100000}+ LPA`;
+    return `₹${job.salary.min/100000} - ${job.salary.max/100000} LPA`;
+  };
 
   return (
     <section className="py-20 bg-slate-50/60">
@@ -321,51 +305,61 @@ const FeaturedJobsSection = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {showcaseJobs.map((job, idx) => (
-            <div 
-              key={idx} 
-              className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-200/70 shadow-xs hover:shadow-xl hover:border-brand-200 transition-all duration-300 flex flex-col justify-between group"
-            >
-              <div>
-                <div className="flex items-start justify-between gap-4 mb-4">
-                  <div>
-                    <span className="inline-block px-3 py-1 rounded-full bg-brand-50 text-brand-700 text-xs font-bold mb-2">
-                      {job.badge}
+        {loading ? (
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-brand-600"></div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {featuredJobs.map((job) => (
+              <div 
+                key={job._id} 
+                className="bg-white rounded-3xl p-6 sm:p-7 border border-gray-200/70 shadow-xs hover:shadow-xl hover:border-brand-200 transition-all duration-300 flex flex-col justify-between group"
+              >
+                <div>
+                  <div className="flex items-start justify-between gap-4 mb-4">
+                    <div>
+                      <span className="inline-block px-3 py-1 rounded-full bg-brand-50 text-brand-700 text-xs font-bold mb-2 capitalize">
+                        {job.workMode || job.jobType || 'Active'}
+                      </span>
+                      <h3 className="text-xl font-bold text-gray-900 group-hover:text-brand-600 transition-colors">
+                        <Link to={`/jobs/${job._id}`}>{job.title}</Link>
+                      </h3>
+                      <p className="text-gray-500 font-medium text-sm mt-0.5">{job.company?.name || 'Top Company'}</p>
+                    </div>
+                    {job.company?.logo ? (
+                      <img src={job.company.logo} alt={job.company.name} className="w-12 h-12 rounded-2xl object-cover shrink-0 border border-gray-100" />
+                    ) : (
+                      <div className="w-12 h-12 rounded-2xl bg-orange-50 text-brand-600 font-bold text-lg flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                        <Building2 size={22} />
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs font-semibold text-gray-500 mb-6">
+                    <span className="flex items-center gap-1"><MapPin size={14} className="text-brand-500" /> {job.location}</span>
+                    <span className="flex items-center gap-1"><Briefcase size={14} className="text-brand-500" /> {job.jobType}</span>
+                    <span className="flex items-center gap-1 text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1 rounded-md">
+                      <DollarSign size={14} /> {formatSalary(job)}
                     </span>
-                    <h3 className="text-xl font-bold text-gray-900 group-hover:text-brand-600 transition-colors">
-                      {job.title}
-                    </h3>
-                    <p className="text-gray-500 font-medium text-sm mt-0.5">{job.company}</p>
-                  </div>
-                  <div className="w-12 h-12 rounded-2xl bg-orange-50 text-brand-600 font-bold text-lg flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
-                    <Building2 size={22} />
                   </div>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-y-2 gap-x-4 text-xs font-semibold text-gray-500 mb-6">
-                  <span className="flex items-center gap-1"><MapPin size={14} className="text-brand-500" /> {job.location}</span>
-                  <span className="flex items-center gap-1"><Briefcase size={14} className="text-brand-500" /> {job.type}</span>
-                  <span className="flex items-center gap-1 text-emerald-700 font-bold bg-emerald-50 px-2.5 py-1 rounded-md">
-                    <DollarSign size={14} /> {job.salary}
+                <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                  <span className="text-xs font-medium text-gray-400 flex items-center gap-1">
+                    <Clock size={13} /> {new Date(job.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}
                   </span>
+                  <Link 
+                    to={`/jobs/${job._id}`} 
+                    className="px-5 py-2.5 rounded-full bg-slate-900 hover:bg-brand-600 text-white font-bold text-xs transition-colors shadow-xs"
+                  >
+                    View Details
+                  </Link>
                 </div>
               </div>
-
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                <span className="text-xs font-medium text-gray-400 flex items-center gap-1">
-                  <Clock size={13} /> {job.posted}
-                </span>
-                <Link 
-                  to="/jobs" 
-                  className="px-5 py-2.5 rounded-full bg-slate-900 hover:bg-brand-600 text-white font-bold text-xs transition-colors shadow-xs"
-                >
-                  Quick Apply
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
       </div>
     </section>

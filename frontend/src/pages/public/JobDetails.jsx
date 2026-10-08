@@ -27,6 +27,8 @@ const JobDetails = () => {
   const [alertEmail, setAlertEmail] = useState('');
   const [alertSubscribed, setAlertSubscribed] = useState(false);
 
+  const { user } = useAuth();
+
   useEffect(() => {
     const fetchJobDetails = async () => {
       setLoading(true);
@@ -43,6 +45,20 @@ const JobDetails = () => {
         if (similarRes.data.success) {
           setSimilarJobs(similarRes.data.data || []);
         }
+
+        if (user && user.role === 'candidate') {
+          try {
+            const appsRes = await axios.get('/api/applications');
+            if (appsRes.data.success && Array.isArray(appsRes.data.data.applications)) {
+              const alreadyApplied = appsRes.data.data.applications.some(
+                app => app.job?._id === id || app.job === id
+              );
+              setHasApplied(alreadyApplied);
+            }
+          } catch (e) {
+            console.log('Error checking candidate application status:', e);
+          }
+        }
       } catch (err) {
         console.error('Error fetching job details:', err);
         setError('Failed to load job details. Please try again.');
@@ -53,14 +69,12 @@ const JobDetails = () => {
 
     fetchJobDetails();
     window.scrollTo(0, 0);
-  }, [id]);
+  }, [id, user]);
 
   const showToast = (msg) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(''), 3000);
   };
-
-  const { user } = useAuth();
 
   const handleApply = async () => {
     if (hasApplied) return;

@@ -71,8 +71,25 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const refreshUser = async () => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      try {
+        const { data } = await axios.get('/api/auth/me');
+        if (data && data.data && data.data.user) {
+          setUser(data.data.user);
+          return data.data.user;
+        }
+      } catch (error) {
+        console.error('Error refreshing user', error);
+      }
+    }
+    return null;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, loading }}>
+    <AuthContext.Provider value={{ user, setUser, login, register, logout, refreshUser, loading }}>
       {!loading && children}
     </AuthContext.Provider>
   );
