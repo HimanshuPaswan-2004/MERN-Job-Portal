@@ -3,9 +3,6 @@ import axios from 'axios';
 
 const AuthContext = createContext();
 
-// Set base URL once at module load time
-axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-
 export const useAuth = () => {
   return useContext(AuthContext);
 };
@@ -13,6 +10,9 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  // Configure axios defaults
+  axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
 
   const demoUser = {
     _id: 'recruiter-demo-1',

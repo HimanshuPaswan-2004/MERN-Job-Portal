@@ -1,10 +1,9 @@
 import express from 'express';
 import upload from '../middleware/uploadMiddleware.js';
-import path from 'path';
 
 const router = express.Router();
 
-// @desc    Upload file
+// @desc    Upload file (image or PDF)
 // @route   POST /api/upload
 // @access  Public
 router.post('/', upload.single('file'), (req, res) => {
@@ -12,18 +11,21 @@ router.post('/', upload.single('file'), (req, res) => {
     return res.status(400).json({ success: false, message: 'Please upload a file' });
   }
   
-  // Construct a clean URL path using just the filename to avoid OS path separator issues
-  const filename = path.basename(req.file.filename || req.file.originalname);
-  const filePath = `/uploads/${filename}`;
+  // Return the correct URL path for the uploaded file
+  const fileName = req.file.filename;
+  const fileUrl = `/uploads/${fileName}`;
   
   res.status(200).json({
     success: true,
     message: 'File uploaded successfully',
     data: {
-      url: filePath
+      url: fileUrl,
+      filename: fileName,
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
     }
   });
 });
 
 export default router;
-

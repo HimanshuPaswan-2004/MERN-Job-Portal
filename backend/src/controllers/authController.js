@@ -110,30 +110,24 @@ export const updateProfile = async (req, res, next) => {
     if (user) {
       user.name = req.body.name || user.name;
       user.email = req.body.email || user.email;
+      user.phone = req.body.phone || user.phone;
+      user.location = req.body.location || user.location;
+      user.bio = req.body.bio !== undefined ? req.body.bio : user.bio;
+      user.dateOfBirth = req.body.dateOfBirth ? req.body.dateOfBirth : (req.body.dateOfBirth === '' ? null : user.dateOfBirth);
+      user.gender = req.body.gender || user.gender;
+      user.linkedin = req.body.linkedin || user.linkedin;
+      user.github = req.body.github || user.github;
+      user.portfolio = req.body.portfolio || user.portfolio;
+      user.tagline = req.body.tagline || user.tagline;
+      user.preferredJobType = req.body.preferredJobType || user.preferredJobType;
+      user.expectedSalary = req.body.expectedSalary || user.expectedSalary;
+      user.profilePhoto = req.body.profilePhoto || user.profilePhoto;
       
-      // Optional fields - allow setting to empty string to clear
-      if (req.body.phone !== undefined) user.phone = req.body.phone;
-      if (req.body.location !== undefined) user.location = req.body.location;
-      if (req.body.bio !== undefined) user.bio = req.body.bio;
-      if (req.body.gender !== undefined && req.body.gender) user.gender = req.body.gender;
-      if (req.body.linkedin !== undefined) user.linkedin = req.body.linkedin;
-      if (req.body.github !== undefined) user.github = req.body.github;
-      if (req.body.portfolio !== undefined) user.portfolio = req.body.portfolio;
-      if (req.body.tagline !== undefined) user.tagline = req.body.tagline;
-      if (req.body.preferredJobType !== undefined && req.body.preferredJobType) user.preferredJobType = req.body.preferredJobType;
-      if (req.body.expectedSalary !== undefined) user.expectedSalary = req.body.expectedSalary;
-      if (req.body.profilePhoto !== undefined && req.body.profilePhoto) user.profilePhoto = req.body.profilePhoto;
-      
-      // Handle dateOfBirth - allow clearing with empty string
-      if (req.body.dateOfBirth !== undefined) {
-        user.dateOfBirth = req.body.dateOfBirth ? new Date(req.body.dateOfBirth) : null;
-      }
-      
-      // Update arrays - allow clearing with empty array
-      if (Array.isArray(req.body.skills)) user.skills = req.body.skills;
-      if (Array.isArray(req.body.education)) user.education = req.body.education;
-      if (Array.isArray(req.body.experience)) user.experience = req.body.experience;
-      if (req.body.resume !== undefined && req.body.resume) user.resume = req.body.resume;
+      // Update arrays if provided
+      if (req.body.skills) user.skills = req.body.skills;
+      if (req.body.education) user.education = req.body.education;
+      if (req.body.experience) user.experience = req.body.experience;
+      if (req.body.resume) user.resume = req.body.resume;
 
       const updatedUser = await user.save();
 

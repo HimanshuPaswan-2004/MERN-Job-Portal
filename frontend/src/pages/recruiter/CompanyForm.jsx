@@ -35,21 +35,25 @@ const CompanyForm = () => {
   const isEditMode = Boolean(id);
 
   const [formData, setFormData] = useState({
-    name: '',
-    website: '',
-    industry: '',
-    companySize: '',
-    foundedYear: '',
-    companyType: '',
+    name: isEditMode ? 'TechNova Solutions' : '',
+    website: isEditMode ? 'https://www.technova.com' : '',
+    industry: isEditMode ? 'Information Technology' : '',
+    companySize: isEditMode ? '201 – 500 employees' : '',
+    foundedYear: isEditMode ? '2018' : '',
+    companyType: isEditMode ? 'Private Limited' : '',
     country: 'India',
-    city: '',
-    state: '',
-    address: '',
-    shortDescription: '',
-    fullDescription: '',
-    linkedin: '',
-    twitter: '',
-    socialWebsite: '',
+    city: isEditMode ? 'Bangalore' : '',
+    state: isEditMode ? 'Karnataka' : '',
+    address: isEditMode ? '123 Innovation Drive, Koramangala, Bangalore - 560034' : '',
+    shortDescription: isEditMode
+      ? 'TechNova Solutions is a leading IT services and consulting company focused on building innovative software solutions for global clients.'
+      : '',
+    fullDescription: isEditMode
+      ? 'TechNova Solutions is a forward-thinking technology company that helps businesses accelerate their digital transformation. We specialize in web and mobile application development, cloud solutions, AI/ML, and enterprise software. Our mission is to build innovative solutions that create real impact and empower businesses worldwide.'
+      : '',
+    linkedin: isEditMode ? 'https://linkedin.com/company/technova' : '',
+    twitter: isEditMode ? 'https://twitter.com/technova' : '',
+    socialWebsite: isEditMode ? 'https://www.technova.com' : '',
     status: 'Active',
   });
 
