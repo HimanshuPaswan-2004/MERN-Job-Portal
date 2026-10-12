@@ -4,23 +4,16 @@ import {
   Search,
   ChevronDown,
   ChevronRight,
-  SlidersHorizontal,
   MapPin,
   Briefcase,
   IndianRupee,
-  Clock,
-  Bell,
-  Info,
   CheckCircle2,
   XCircle,
   AlertCircle,
-  FileText,
-  Calendar,
   Building2,
   Sparkles,
   ArrowRight,
   X,
-  ExternalLink,
   HelpCircle
 } from 'lucide-react';
 import axios from 'axios';

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import axios from 'axios';
@@ -20,15 +20,12 @@ import {
   CheckCircle2,
   ArrowRight,
   Plus,
-  Lightbulb,
-  ExternalLink,
-  Loader2
+  Lightbulb
 } from 'lucide-react';
 
 const RecruiterDashboard = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('Dashboard');
   const [timeRange, setTimeRange] = useState('Last 8 Months');
   
@@ -86,15 +83,10 @@ const RecruiterDashboard = () => {
     }
   });
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) {
-        setLoading(false);
         return;
       }
       const response = await axios.get('/api/applications/recruiter-dashboard', {
@@ -147,10 +139,12 @@ const RecruiterDashboard = () => {
       }
     } catch (err) {
       console.log('Using default recruiter dashboard initial view', err);
-    } finally {
-      setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   // Status badge styling helper
   const getStatusBadge = (status) => {

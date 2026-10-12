@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link, useParams, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
 import {
   Users,
@@ -16,32 +16,22 @@ import {
   Edit3,
   ChevronLeft,
   Filter,
-  Send,
   X,
   CheckCircle,
   FileCode,
   Sparkles,
-  UserX,
   Clock,
   Building,
   CheckCircle2,
-  AlertCircle,
   SlidersHorizontal,
-  ChevronDown,
-  Mail,
-  Trash2,
-  ExternalLink,
-  Award,
   Check,
-  RefreshCw,
-  Share2
+  RefreshCw
 } from 'lucide-react';
 import RecruiterLayout from '../../components/layout/RecruiterLayout';
 
 const JobApplicants = () => {
   const { jobId } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const queryJobId = jobId || searchParams.get('jobId') || 'all';
 
   // State definitions
@@ -94,7 +84,6 @@ const JobApplicants = () => {
 
   // Resume Modal state
   const [viewCandidate, setViewCandidate] = useState(null);
-  const [modalTab, setModalTab] = useState('overview');
 
   // Toast feedback
   const [toastMessage, setToastMessage] = useState(null);
@@ -104,7 +93,7 @@ const JobApplicants = () => {
     setTimeout(() => setToastMessage(null), 3500);
   };
 
-  const fetchApplicants = async (page = 1) => {
+  const fetchApplicants = useCallback(async (page = 1) => {
     try {
       setLoading(true);
       const params = {
@@ -131,11 +120,11 @@ const JobApplicants = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [queryJobId, pagination.limit, activeTab, filterStatus, searchTerm, filterExperience, filterLocation, filterSkill, sortBy]);
 
   useEffect(() => {
     fetchApplicants(1);
-  }, [queryJobId, activeTab, sortBy]);
+  }, [fetchApplicants]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();

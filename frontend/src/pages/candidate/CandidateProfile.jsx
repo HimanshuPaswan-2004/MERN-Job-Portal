@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { 
-  MapPin, Phone, Mail, Link as LinkIcon, Camera, CheckCircle2, Circle, 
-  FileText, Download, Upload, Trash2, Edit2, Plus, Briefcase, GraduationCap, Settings,
+  MapPin, Phone, Mail, CheckCircle2, Circle, 
+  FileText, Download, Upload, Edit2, Plus, Briefcase, GraduationCap, Settings,
   User, Share2, Sparkles, ExternalLink, Globe, Award, ShieldCheck, Copy, Check,
-  ArrowRight, Calendar, Building2
+  Calendar, Building2
 } from 'lucide-react';
 
 const LinkedInIcon = ({ size = 16, className = "" }) => (

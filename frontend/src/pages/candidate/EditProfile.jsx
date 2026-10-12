@@ -3,8 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { 
-  User, Briefcase, GraduationCap, Link as LinkIcon, Settings,
-  Camera, CheckCircle2, Circle, Lightbulb, Eye, BarChart2,
+  User, Briefcase, GraduationCap, Settings,
+  Camera, CheckCircle2, Circle, Lightbulb,
   MapPin, FileText, Plus, Trash2, Upload
 } from 'lucide-react';
 
@@ -15,11 +15,26 @@ const EditProfile = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
   
-  const [formData, setFormData] = useState({
-    name: '', email: '', phone: '', location: '', dateOfBirth: '', gender: 'Male', bio: '',
-    linkedin: '', github: '', portfolio: '', tagline: '', preferredJobType: 'Full Time', expectedSalary: 'Not Disclosed',
-    skills: [], education: [], experience: [], resume: '', profilePhoto: ''
-  });
+  const [formData, setFormData] = useState(() => ({
+    name: user?.name || '',
+    email: user?.email || '',
+    phone: user?.phone || '',
+    location: user?.location || '',
+    dateOfBirth: user?.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : '',
+    gender: user?.gender || 'Male',
+    bio: user?.bio || '',
+    linkedin: user?.linkedin || '',
+    github: user?.github || '',
+    portfolio: user?.portfolio || '',
+    tagline: user?.tagline || '',
+    preferredJobType: user?.preferredJobType || 'Full Time',
+    expectedSalary: user?.expectedSalary || 'Not Disclosed',
+    skills: user?.skills || [],
+    education: user?.education || [],
+    experience: user?.experience || [],
+    resume: user?.resume || '',
+    profilePhoto: user?.profilePhoto || ''
+  }));
 
   const fileInputRef = useRef(null);
   const resumeInputRef = useRef(null);

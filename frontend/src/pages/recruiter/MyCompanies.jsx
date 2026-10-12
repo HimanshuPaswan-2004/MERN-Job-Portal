@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import {
@@ -15,11 +15,76 @@ import {
   MoreVertical,
   Lightbulb,
   ArrowRight,
-  ExternalLink,
-  ChevronDown,
-  CheckCircle2,
   AlertCircle
 } from 'lucide-react';
+
+// Sample data fallback matching screenshot design
+const defaultCompanies = [
+  {
+    _id: 'sample-1',
+    name: 'TechNova Solutions',
+    status: 'Active',
+    industry: 'IT Services & Consulting',
+    location: 'Bangalore, India',
+    companySize: '201 – 500 employees',
+    industryCategory: 'Information Technology',
+    description: 'TechNova Solutions is a leading IT services company focused on building innovative software solutions for global clients.',
+    jobsCount: 12,
+    applicantsCount: 248,
+    hiredCount: 5,
+    logo: null,
+    logoBg: 'bg-black text-white font-extrabold text-2xl',
+    logoChar: 'T'
+  },
+  {
+    _id: 'sample-2',
+    name: 'Google',
+    status: 'Active',
+    industry: 'Technology • Internet',
+    location: 'Mountain View, USA',
+    companySize: '10,001+ employees',
+    industryCategory: 'Technology',
+    description: "Google's mission is to organize the world's information and make it universally accessible and useful.",
+    jobsCount: 8,
+    applicantsCount: 320,
+    hiredCount: 12,
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg',
+    logoBg: 'bg-white',
+    logoChar: 'G'
+  },
+  {
+    _id: 'sample-3',
+    name: 'Microsoft',
+    status: 'Active',
+    industry: 'Software • Cloud • AI',
+    location: 'Redmond, USA',
+    companySize: '10,001+ employees',
+    industryCategory: 'Technology',
+    description: 'Empowering every person and every organization on the planet to achieve more.',
+    jobsCount: 5,
+    applicantsCount: 180,
+    hiredCount: 9,
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg',
+    logoBg: 'bg-white',
+    logoChar: 'M'
+  },
+  {
+    _id: 'sample-4',
+    name: 'Amazon',
+    status: 'Inactive',
+    industry: 'E-commerce • Cloud • Retail',
+    location: 'Seattle, USA',
+    companySize: '10,001+ employees',
+    industryCategory: 'E-commerce',
+    description: 'Amazon is committed to being Earth\'s most customer-centric company, where people can find and discover anything they might want to buy online.',
+    jobsCount: 3,
+    applicantsCount: 96,
+    hiredCount: 4,
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg',
+    logoBg: 'bg-white',
+    logoChar: 'A'
+  }
+];
 
 const MyCompanies = () => {
   const [companies, setCompanies] = useState([]);
@@ -30,79 +95,7 @@ const MyCompanies = () => {
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
   const navigate = useNavigate();
 
-  // Sample data fallback matching screenshot design
-  const defaultCompanies = [
-    {
-      _id: 'sample-1',
-      name: 'TechNova Solutions',
-      status: 'Active',
-      industry: 'IT Services & Consulting',
-      location: 'Bangalore, India',
-      companySize: '201 – 500 employees',
-      industryCategory: 'Information Technology',
-      description: 'TechNova Solutions is a leading IT services company focused on building innovative software solutions for global clients.',
-      jobsCount: 12,
-      applicantsCount: 248,
-      hiredCount: 5,
-      logo: null,
-      logoBg: 'bg-black text-white font-extrabold text-2xl',
-      logoChar: 'T'
-    },
-    {
-      _id: 'sample-2',
-      name: 'Google',
-      status: 'Active',
-      industry: 'Technology • Internet',
-      location: 'Mountain View, USA',
-      companySize: '10,001+ employees',
-      industryCategory: 'Technology',
-      description: "Google's mission is to organize the world's information and make it universally accessible and useful.",
-      jobsCount: 8,
-      applicantsCount: 320,
-      hiredCount: 12,
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg',
-      logoBg: 'bg-white',
-      logoChar: 'G'
-    },
-    {
-      _id: 'sample-3',
-      name: 'Microsoft',
-      status: 'Active',
-      industry: 'Software • Cloud • AI',
-      location: 'Redmond, USA',
-      companySize: '10,001+ employees',
-      industryCategory: 'Technology',
-      description: 'Empowering every person and every organization on the planet to achieve more.',
-      jobsCount: 5,
-      applicantsCount: 180,
-      hiredCount: 9,
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg',
-      logoBg: 'bg-white',
-      logoChar: 'M'
-    },
-    {
-      _id: 'sample-4',
-      name: 'Amazon',
-      status: 'Inactive',
-      industry: 'E-commerce • Cloud • Retail',
-      location: 'Seattle, USA',
-      companySize: '10,001+ employees',
-      industryCategory: 'E-commerce',
-      description: 'Amazon is committed to being Earth\'s most customer-centric company, where people can find and discover anything they might want to buy online.',
-      jobsCount: 3,
-      applicantsCount: 96,
-      hiredCount: 4,
-      logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg',
-      logoBg: 'bg-white',
-      logoChar: 'A'
-    }
-  ];
-
-  useEffect(() => {
-    fetchCompanies();
-  }, []);
-
-  const fetchCompanies = async () => {
+  const fetchCompanies = useCallback(async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
@@ -136,7 +129,11 @@ const MyCompanies = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchCompanies();
+  }, [fetchCompanies]);
 
   const handleDelete = async (id) => {
     try {

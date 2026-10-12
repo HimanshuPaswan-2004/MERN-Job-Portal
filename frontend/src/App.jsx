@@ -20,8 +20,7 @@ import MyApplications from './pages/candidate/MyApplications';
 import JobApplicants from './pages/recruiter/JobApplicants';
 import RecruiterLayout from './components/layout/RecruiterLayout';
 
-// Dummy components for now
-import { Home as HomeIcon, Search, FileText, User as UserIcon, FileCode, Bookmark, Bell, Settings, LogOut, Briefcase } from 'lucide-react';
+import { Home as HomeIcon, Search, FileText, User as UserIcon, FileCode, Bookmark, LogOut, Briefcase } from 'lucide-react';
 
 const SidebarItem = ({ icon, label, to, isActive }) => (
   <Link to={to || "#"} className={`flex items-center gap-3 px-4 py-3 rounded-xl mb-1 transition-colors ${isActive ? 'bg-orange-50 text-brand-600 font-bold' : 'text-gray-600 font-medium hover:bg-gray-50 hover:text-brand-600'}`}>
@@ -88,11 +87,7 @@ const CandidateLayout = ({ children }) => {
   );
 };
 
-const MainLayout = ({ children }) => (
-  <div className="container mx-auto px-4 py-8">
-    {children}
-  </div>
-);
+
 
 const AppContent = () => {
   const location = useLocation();

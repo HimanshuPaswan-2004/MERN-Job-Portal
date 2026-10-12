@@ -333,13 +333,24 @@ const CompanyForm = () => {
 
                   {/* Change Logo Button & Specs */}
                   <div className="flex flex-col items-center sm:items-start pt-1 space-y-1">
-                    <label
-                      htmlFor="company-logo-input"
-                      className="px-4 py-2 bg-white border border-gray-200 text-gray-700 hover:text-[#f9571c] hover:border-orange-200 rounded-xl text-xs font-bold transition-colors shadow-2xs flex items-center gap-2 cursor-pointer"
-                    >
-                      <Upload className="w-3.5 h-3.5 text-gray-500" />
-                      <span>Change Logo</span>
-                    </label>
+                    <div className="flex items-center gap-2">
+                      <label
+                        htmlFor="company-logo-input"
+                        className="px-4 py-2 bg-white border border-gray-200 text-gray-700 hover:text-[#f9571c] hover:border-orange-200 rounded-xl text-xs font-bold transition-colors shadow-2xs flex items-center gap-2 cursor-pointer"
+                      >
+                        <Upload className="w-3.5 h-3.5 text-gray-500" />
+                        <span>Change Logo</span>
+                      </label>
+                      {logoPreview && (
+                        <button
+                          type="button"
+                          onClick={removeLogo}
+                          className="px-3 py-2 bg-red-50 border border-red-200 text-red-600 hover:bg-red-100 rounded-xl text-xs font-bold transition-colors cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                      )}
+                    </div>
                     <span className="text-[11px] text-gray-400 font-medium">PNG, JPG (Max 2MB)</span>
                   </div>
                 </div>

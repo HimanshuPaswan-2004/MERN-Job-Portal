@@ -11,6 +11,8 @@ import jobRoutes from './src/routes/jobRoutes.js';
 import applicationRoutes from './src/routes/applicationRoutes.js';
 import uploadRoutes from './src/routes/uploadRoutes.js';
 import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 
@@ -37,8 +39,13 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/upload', uploadRoutes);
 
-const __dirname = path.resolve();
-app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const uploadsPath = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsPath)) {
+  fs.mkdirSync(uploadsPath, { recursive: true });
+}
+app.use('/uploads', express.static(uploadsPath));
 
 app.get('/', (req, res) => {
   res.send('JobPortal API is running...');

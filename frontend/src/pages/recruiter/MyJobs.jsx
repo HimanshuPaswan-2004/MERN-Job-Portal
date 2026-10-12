@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 import {
   Plus,
@@ -16,14 +16,11 @@ import {
   Filter,
   ChevronRight,
   Trash2,
-  Users,
   Eye,
-  Building2,
   RotateCcw
 } from 'lucide-react';
 
 const MyJobs = () => {
-  const navigate = useNavigate();
   const [jobs, setJobs] = useState([]);
   const [summary, setSummary] = useState({
     totalJobs: 0,
@@ -46,7 +43,7 @@ const MyJobs = () => {
   // Active dropdown state for card menu
   const [activeDropdown, setActiveDropdown] = useState(null);
 
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async () => {
     try {
       setLoading(true);
       const params = {};
@@ -75,11 +72,11 @@ const MyJobs = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchTerm, statusFilter, jobTypeFilter, locationFilter, companyFilter, sortBy]);
 
   useEffect(() => {
     fetchJobs();
-  }, [statusFilter, sortBy]);
+  }, [fetchJobs]);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();

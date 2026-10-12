@@ -7,7 +7,6 @@ import {
   Briefcase,
   Clock,
   ExternalLink,
-  Calendar,
   Lightbulb,
   Eye,
   Bold,
@@ -16,9 +15,7 @@ import {
   List,
   ListOrdered,
   Link as LinkIcon,
-  ChevronDown,
-  Sparkles,
-  Check
+  ChevronDown
 } from 'lucide-react';
 
 const JobForm = () => {
@@ -47,7 +44,6 @@ const JobForm = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [activeTab, setActiveTab] = useState('edit');
 
   const navigate = useNavigate();
   const { id } = useParams();
@@ -96,7 +92,7 @@ const JobForm = () => {
             requirements: job.requirements ? job.requirements.join('\n') : '',
             status: job.status || 'active',
           });
-        } catch (err) {
+        } catch {
           setError('Error fetching job details');
         }
       };

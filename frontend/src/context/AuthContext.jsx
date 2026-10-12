@@ -1,6 +1,8 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 
+axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
+
 const AuthContext = createContext();
 
 export const useAuth = () => {
@@ -10,17 +12,6 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Configure axios defaults
-  axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000';
-
-  const demoUser = {
-    _id: 'recruiter-demo-1',
-    name: 'TechNova HR',
-    email: 'hr@technova.com',
-    role: 'recruiter',
-    company: 'TechNova Solutions'
-  };
 
   useEffect(() => {
     const checkLoggedInUser = async () => {

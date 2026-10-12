@@ -3,10 +3,10 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext';
 import { 
-  MapPin, Briefcase, BarChart, IndianRupee, Bookmark, Share2, 
-  Users, Building, ChevronRight, Home, ExternalLink, ArrowRight, Clock, 
-  Search, CheckCircle2, Sparkles, Heart, Check, Copy, ShieldCheck, 
-  HelpCircle, Award, FileText, List, Laptop, Building2, Bell, AlertCircle
+  MapPin, Briefcase, BarChart, IndianRupee, Share2, 
+  Users, ChevronRight, Home, ExternalLink, ArrowRight, Clock, 
+  Search, CheckCircle2, Sparkles, Heart, Check, 
+  HelpCircle, Award, FileText, List, Laptop, Building2, Bell
 } from 'lucide-react';
 
 const JobDetails = () => {

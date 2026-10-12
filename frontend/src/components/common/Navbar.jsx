@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Briefcase, Menu, X, Sparkles, User, LogOut } from 'lucide-react';
+import { Briefcase, Menu, X, Sparkles, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
@@ -11,7 +11,7 @@ const Navbar = () => {
   let navLinks = [
     { name: 'Home', path: '/' },
     { name: 'Browse Jobs', path: '/jobs' },
-    { name: 'Companies', path: '/recruiter/companies' },
+    { name: 'Companies', path: '/companies' },
   ];
 
   if (user?.role === 'candidate') {

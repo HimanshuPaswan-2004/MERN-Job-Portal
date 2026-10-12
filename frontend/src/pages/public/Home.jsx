@@ -4,7 +4,7 @@ import axios from 'axios';
 import { 
   Search, MapPin, Briefcase, FileText, Bell, TrendingUp, Code, Database, 
   Palette, LayoutDashboard, Megaphone, Users, ArrowRight, CheckCircle2, 
-  Sparkles, Building2, Zap, Star, ShieldCheck, DollarSign, Clock, Layers
+  Sparkles, Building2, Zap, Star, ShieldCheck, DollarSign, Clock
 } from 'lucide-react';
 
 // --- Hero Section ---

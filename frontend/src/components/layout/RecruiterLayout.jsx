@@ -11,11 +11,7 @@ import {
   FileText,
   PlusCircle,
   Users,
-  User,
-  Settings,
-  LogOut,
-  ArrowRight,
-  Building
+  LogOut
 } from 'lucide-react';
 
 const RecruiterLayout = ({ children }) => {

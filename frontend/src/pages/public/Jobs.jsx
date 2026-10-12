@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
-  Search, MapPin, Bookmark, Clock, ChevronDown, Filter, 
+  Search, MapPin, Clock, ChevronDown, Filter, 
   ChevronLeft, ChevronRight, X, Briefcase, Sparkles, 
   Building2, ArrowRight, RotateCcw, Heart, CheckCircle2, SlidersHorizontal 
 } from 'lucide-react';
@@ -69,7 +69,7 @@ const Jobs = () => {
     { value: '5+ years', label: '5+ Years' }
   ];
 
-  const fetchJobs = async () => {
+  const fetchJobs = useCallback(async () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
@@ -92,11 +92,11 @@ const Jobs = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [appliedFilters]);
 
   useEffect(() => {
     fetchJobs();
-  }, [appliedFilters]);
+  }, [fetchJobs]);
 
   const handleApplyFilters = () => {
     setAppliedFilters({
