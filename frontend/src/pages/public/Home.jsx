@@ -224,11 +224,11 @@ const HeroSection = () => {
 // --- Trusted By Section ---
 const TrustedBySection = () => {
   const companyLogos = [
-    { name: 'Google', logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg' },
-    { name: 'Microsoft', logo: 'https://upload.wikimedia.org/wikipedia/commons/9/96/Microsoft_logo_%282012%29.svg' },
-    { name: 'Amazon', logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg' },
-    { name: 'Adobe', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/cb/Adobe_logo_and_wordmark.svg' },
-    { name: 'Meta', logo: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Meta_Platforms_Inc._logo.svg' }
+    { name: 'Google', logo: '/logos/google.svg' },
+    { name: 'Microsoft', logo: '/logos/microsoft.svg' },
+    { name: 'Amazon', logo: '/logos/amazon.svg' },
+    { name: 'Adobe', logo: '/logos/adobe.svg' },
+    { name: 'Meta', logo: '/logos/meta.svg' }
   ];
 
   return (
