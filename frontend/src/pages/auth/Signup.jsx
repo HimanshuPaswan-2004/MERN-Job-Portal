@@ -253,16 +253,24 @@ const Signup = () => {
               <button
                 type="button"
                 onClick={() => handleQuickFill('candidate')}
-                className="px-3 py-1.5 text-xs font-semibold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 rounded-lg transition-all text-center flex items-center justify-center gap-1.5"
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-center flex items-center justify-center gap-1.5 ${
+                  formData.role === 'candidate'
+                    ? 'text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 shadow-xs'
+                    : 'text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 shadow-2xs'
+                }`}
               >
-                <UserCheck className="w-3.5 h-3.5" /> Demo Jobseeker
+                <UserCheck className={`w-3.5 h-3.5 ${formData.role === 'candidate' ? 'text-brand-600' : 'text-slate-500'}`} /> Demo Jobseeker
               </button>
               <button
                 type="button"
                 onClick={() => handleQuickFill('recruiter')}
-                className="px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 rounded-lg transition-all text-center flex items-center justify-center gap-1.5 shadow-2xs"
+                className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all text-center flex items-center justify-center gap-1.5 ${
+                  formData.role === 'recruiter'
+                    ? 'text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 shadow-xs'
+                    : 'text-slate-700 bg-white hover:bg-slate-100 border border-slate-200 shadow-2xs'
+                }`}
               >
-                <Building2 className="w-3.5 h-3.5 text-slate-600" /> Demo Recruiter
+                <Building2 className={`w-3.5 h-3.5 ${formData.role === 'recruiter' ? 'text-brand-600' : 'text-slate-500'}`} /> Demo Recruiter
               </button>
             </div>
           </div>
