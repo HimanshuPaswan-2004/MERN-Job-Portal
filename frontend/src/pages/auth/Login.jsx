@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { 
   Briefcase, 
@@ -17,14 +17,16 @@ import {
 } from 'lucide-react';
 
 const Login = () => {
+  const location = useLocation();
   const [formData, setFormData] = useState({
-    email: '',
+    email: location.state?.email || '',
     password: '',
     rememberMe: false
   });
   const [activeDemo, setActiveDemo] = useState('candidate');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState(location.state?.message || '');
   const [loading, setLoading] = useState(false);
 
   const { login } = useAuth();
@@ -40,6 +42,7 @@ const Login = () => {
 
   const handleQuickFill = (role) => {
     setActiveDemo(role);
+    setSuccessMessage('');
     if (role === 'candidate') {
       setFormData({
         email: 'candidate@example.com',
@@ -59,6 +62,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccessMessage('');
     
     try {
       setLoading(true);
@@ -223,6 +227,17 @@ const Login = () => {
               </button>
             </div>
           </div>
+
+          {/* Success Notification Box (e.g. after Registration) */}
+          {successMessage && !error && (
+            <div className="mb-6 p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm flex items-start gap-3 animate-fade-in shadow-xs">
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <p className="font-semibold">Account Created Successfully!</p>
+                <p className="text-xs text-emerald-700 mt-0.5">{successMessage}</p>
+              </div>
+            </div>
+          )}
 
           {/* Error Alert Box */}
           {error && (

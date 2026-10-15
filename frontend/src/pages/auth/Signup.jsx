@@ -115,7 +115,12 @@ const Signup = () => {
         role: formData.role
       });
 
-      navigate(formData.role === 'recruiter' ? '/recruiter/dashboard' : '/candidate/dashboard');
+      navigate('/login', {
+        state: {
+          message: 'Account created successfully! Please sign in with your credentials.',
+          email: formData.email
+        }
+      });
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to register. Please check your details and try again.');
     } finally {
